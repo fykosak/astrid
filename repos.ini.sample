@@ -1,9 +1,4 @@
 [fykos25]
-path=/tmp/foo/.git
-build_cmd=true
-
-[testik]
-path=/home/michal/Documents/Work/Fykos/2012/.git
+path=/~fksgit/data/fykos25.git
 build_cmd=make
-build_args=all
 
