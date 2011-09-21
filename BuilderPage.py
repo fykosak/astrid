@@ -34,15 +34,14 @@ class BuilderPage(object):
                 msg_class = "red"
             
             try:
-                print "pulled: " + repo.head.commit.hexsha
                 if self._build(reponame):
-                    msg = "Build succeeded."
+                    msg = """#%s Build succeeded.""" % repo.head.commit.hexsha[0:6]
                     msg_class = "green"
                 else:
-                    msg = "Build failed."
+                    msg = """#%s Build failed.""" % repo.head.commit.hexsha[0:6]
                     msg_class = "red"
             except:
-                msg = "Build error."
+                msg = """#%s Build error.""" % repo.head.commit.hexsha[0:6]
                 msg_class = "red"
             
             logger = BuildLogger(self.repodir)
