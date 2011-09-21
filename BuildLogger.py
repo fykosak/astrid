@@ -1,4 +1,5 @@
 from datetime import datetime
+import cherrypy
 import os.path
 
 class BuildLogger:
@@ -13,7 +14,8 @@ class BuildLogger:
     def log(self, reponame, message):
         logfile = self._getLogfile(reponame)
         f = open(logfile, "a")
-        f.write(BuildLogger.separator.join([str(datetime.now()), message]) + "\n")
+        user = cherrypy.request.login
+        f.write(BuildLogger.separator.join([str(datetime.now()), message, user]) + "\n")
         f.close()
     
     def getLogs(self, reponame):

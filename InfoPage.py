@@ -21,9 +21,10 @@ class InfoPage(object):
         
         logger = BuildLogger(self.repodir)
         
-        msg = "<table><tr><th>Time</th><th>Message</th></tr>"
+        msg = "<table><tr><th>Time</th><th>Message</th><th>User</th></tr>"
         for record in logger.getLogs(reponame):
-            msg += """<tr><td>%s</td><td>%s</td></tr>""" % (record[0], record[1],)
+            record += ['']*(3-len(record))
+            msg += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % (record[0], record[1],record[2],)
         msg += "</table>"
         
         template = Template("templates/info.html")
