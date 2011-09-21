@@ -1,7 +1,10 @@
 import cherrypy
 import os.path
+import cherrypy.lib.auth_basic
+
 import htmldir
 import staticdirindex
+
 from Template import Template
 from ConfigParser import ConfigParser
 from BuilderPage import BuilderPage
@@ -40,10 +43,9 @@ class StaticAndDynamic(object):
 
 
 
-
-
 root = StaticAndDynamic()
 root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
 root.info = InfoPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
+
 
 cherrypy.quickstart(root, config=conffile)
