@@ -1,17 +1,14 @@
 import cherrypy
 import os.path
 import os
-import subprocess
-import shlex
 
-from git import Repo, Git
 from ConfigParser import ConfigParser
 
 from BuildLogger import BuildLogger
 from Template import Template
 
 
-class Builder(object):
+class Info(object):
     def __init__(self, repodir):
         self.repos = ConfigParser()
         self.repos.read('repos.ini')
@@ -21,31 +18,18 @@ class Builder(object):
     def default(self, reponame):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
-        try:
-            self._updateRepo(reponame)
-        except:
-            msg = "Pull error."
-            msg_class = "red"
-        
-        try:
-            if self._build(reponame):
-                msg = "Build succeeded."
-                msg_class = "green"
-            else:
-                msg = "Build failed."
-                msg_class = "red"
-        except:
-            msg = "Build error."
-            msg_class = "red"
         
         logger = BuildLogger(self.repodir)
-        logger.log(reponame, msg)
         
-        template = Template("templates/build.html")
+        msg = "<table><tr><th>Time</th><th>Message</th></tr>"
+        for record in logger.getLogs(reponame):
+            msg += """<tr><td>%s</td><td>%s</td></tr>""" % (record[0], record[1],)
+        msg += "</table>"
+        
+        template = Template("templates/info.html")
         template.assignData("reponame", reponame)
-        template.assignData("message", msg)
-        template.assignData("msg_class", msg_class)
-        template.assignData("pagetitle", "Build")
+        template.assignData("messages", msg)        
+        template.assignData("pagetitle", reponame + " info")
         
         return template.render()
     
