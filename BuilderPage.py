@@ -12,7 +12,7 @@ from BuildLogger import BuildLogger
 from Template import Template
 
 
-class Builder(object):
+class BuilderPage(object):
     lock = threading.Lock()
     
     def __init__(self, repodir):
@@ -25,15 +25,16 @@ class Builder(object):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
         
-        Builder.lock.acquire() # TODO design to lock only manipulated repository
+        BuilderPage.lock.acquire() # TODO design to lock only manipulated repository
         try:            
             try:
-                self._updateRepo(reponame)
+                repo = self._updateRepo(reponame)
             except:
                 msg = "Pull error."
                 msg_class = "red"
             
             try:
+                print "pulled: " + repo.head.commit.hexsha
                 if self._build(reponame):
                     msg = "Build succeeded."
                     msg_class = "green"
@@ -54,7 +55,7 @@ class Builder(object):
             template.assignData("pagetitle", "Build")
             return template.render()
         finally:
-            Builder.lock.release()            
+            BuilderPage.lock.release()            
     
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
@@ -62,10 +63,12 @@ class Builder(object):
         if not os.path.isdir(localpath):
             os.mkdir(localpath)
             Repo.clone_from(remotepath, localpath)
+            repo = Repo(localpath)
         else:
             repo = Repo(localpath)
             repo.remotes.origin.pull()
-    
+        return repo
+        
     def _build(self, reponame):
         cmd = self.repos.get(reponame, "build_cmd")
         args = self.repos.get(reponame, "build_args")

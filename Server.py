@@ -4,8 +4,8 @@ import htmldir
 import staticdirindex
 from Template import Template
 from ConfigParser import ConfigParser
-from Builder import Builder
-from Info import Info
+from BuilderPage import BuilderPage
+from InfoPage import InfoPage
 
 conffile = os.path.join(os.path.dirname(__file__), 'config.ini')
 cherrypy.config.update(conffile)
@@ -43,7 +43,7 @@ class StaticAndDynamic(object):
 
 
 root = StaticAndDynamic()
-root.build = Builder(os.path.join(rootdir, cherrypy.config.get("repodir")))
-root.info = Info(os.path.join(rootdir, cherrypy.config.get("repodir")))
+root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
+root.info = InfoPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
 
 cherrypy.quickstart(root, config=conffile)

@@ -8,7 +8,7 @@ from BuildLogger import BuildLogger
 from Template import Template
 
 
-class Info(object):
+class InfoPage(object):
     def __init__(self, repodir):
         self.repos = ConfigParser()
         self.repos.read('repos.ini')
