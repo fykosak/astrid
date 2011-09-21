@@ -3,6 +3,7 @@ import os.path
 import os
 import subprocess
 import shlex
+import threading
 
 from git import Repo, Git
 from ConfigParser import ConfigParser
@@ -12,6 +13,8 @@ from Template import Template
 
 
 class Builder(object):
+    lock = threading.Lock()
+    
     def __init__(self, repodir):
         self.repos = ConfigParser()
         self.repos.read('repos.ini')
@@ -21,33 +24,37 @@ class Builder(object):
     def default(self, reponame):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
-        try:
-            self._updateRepo(reponame)
-        except:
-            msg = "Pull error."
-            msg_class = "red"
         
-        try:
-            if self._build(reponame):
-                msg = "Build succeeded."
-                msg_class = "green"
-            else:
-                msg = "Build failed."
+        Builder.lock.acquire() # TODO design to lock only manipulated repository
+        try:            
+            try:
+                self._updateRepo(reponame)
+            except:
+                msg = "Pull error."
                 msg_class = "red"
-        except:
-            msg = "Build error."
-            msg_class = "red"
-        
-        logger = BuildLogger(self.repodir)
-        logger.log(reponame, msg)
-        
-        template = Template("templates/build.html")
-        template.assignData("reponame", reponame)
-        template.assignData("message", msg)
-        template.assignData("msg_class", msg_class)
-        template.assignData("pagetitle", "Build")
-        
-        return template.render()
+            
+            try:
+                if self._build(reponame):
+                    msg = "Build succeeded."
+                    msg_class = "green"
+                else:
+                    msg = "Build failed."
+                    msg_class = "red"
+            except:
+                msg = "Build error."
+                msg_class = "red"
+            
+            logger = BuildLogger(self.repodir)
+            logger.log(reponame, msg)
+            
+            template = Template("templates/build.html")
+            template.assignData("reponame", reponame)
+            template.assignData("message", msg)
+            template.assignData("msg_class", msg_class)
+            template.assignData("pagetitle", "Build")
+            return template.render()
+        finally:
+            Builder.lock.release()            
     
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
