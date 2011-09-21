@@ -29,20 +29,20 @@ class BuilderPage(object):
         try:            
             try:
                 repo = self._updateRepo(reponame)
+                try:
+                    if self._build(reponame):
+                        msg = """#%s Build succeeded.""" % repo.head.commit.hexsha[0:6]
+                        msg_class = "green"
+                    else:
+                        msg = """#%s Build failed.""" % repo.head.commit.hexsha[0:6]
+                        msg_class = "red"
+                except:
+                    msg = """#%s Build error.""" % repo.head.commit.hexsha[0:6]
+                    msg_class = "red"
             except:
                 msg = "Pull error."
                 msg_class = "red"
             
-            try:
-                if self._build(reponame):
-                    msg = """#%s Build succeeded.""" % repo.head.commit.hexsha[0:6]
-                    msg_class = "green"
-                else:
-                    msg = """#%s Build failed.""" % repo.head.commit.hexsha[0:6]
-                    msg_class = "red"
-            except:
-                msg = """#%s Build error.""" % repo.head.commit.hexsha[0:6]
-                msg_class = "red"
             
             logger = BuildLogger(self.repodir)
             logger.log(reponame, msg)
