@@ -1,0 +1,3 @@
+[fykos25]
+path="file://~fksgit/fykos25.git"
+build="make web"
