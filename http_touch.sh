@@ -13,11 +13,11 @@ PWD=pwd
 
 AUTH=$(echo -n "$USER:$PWD" | base64)
 
-$1 = "localhost:8000"
-$2 = "/build/$REPOSITORY_BASENAME"
+PATH="localhost:8000"
+HOST="/build/$REPOSITORY_BASENAME"
 
-REQUEST="HEAD $2 HTTP/1.0\r
-Host: $1\r
+REQUEST="HEAD $PATH HTTP/1.0\r
+Host: $HOST\r
 Authorization: Basic $AUTH\r
 \r
 " 
