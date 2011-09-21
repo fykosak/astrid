@@ -11,6 +11,7 @@ from ConfigParser import ConfigParser
 from BuildLogger import BuildLogger
 from Template import Template
 
+import sys
 
 class BuilderPage(object):
     lock = threading.Lock()
@@ -60,8 +61,8 @@ class BuilderPage(object):
         remotepath = self.repos.get(reponame, "path")
         localpath = os.path.join(self.repodir, reponame)
         if not os.path.isdir(localpath):
-            os.mkdir(localpath)
-            Repo.clone_from(remotepath, localpath)
+            g = Git()
+            g.clone(remotepath, localpath)
             repo = Repo(localpath)
         else:
             repo = Repo(localpath)

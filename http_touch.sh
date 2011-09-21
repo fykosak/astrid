@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 if [ $(git rev-parse --is-bare-repository) = true ]
 then
