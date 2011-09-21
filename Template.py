@@ -3,9 +3,8 @@ import cgi # template
 import re # template
 
 class Template:
-    def __init__(self, filename, presenter):
+    def __init__(self, filename):
         self.filename = filename
-        self.presenter = presenter
         self.includes = {}
         self.data = {}
         
@@ -17,9 +16,7 @@ class Template:
         template = open(self.filename).read()
         template = re.sub('\{include ([^\}]*)\}', self._include, template)
         # secondly expand variables
-        template = re.sub('\{(!)?([^\}]*)\}', self._expand, template)
-        # finally replace links
-        return re.sub('\{link ([^\}]*)(, ?([^\}]*))?\}', self._link, template)        
+        return re.sub('\{(!)?([^\}]*)\}', self._expand, template)
         
     def _include(self, mo):
         filename = os.path.dirname(self.filename) + "/" + mo.group(1)
@@ -43,5 +40,3 @@ class Template:
         else:
             return data
             
-    def _link(self, mo):
-        return self.presenter.controller.getLink(mo.group(1), mo.group(3))

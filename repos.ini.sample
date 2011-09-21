@@ -1,3 +1,9 @@
 [fykos25]
-path="file://~fksgit/fykos25.git"
-build="make web"
+path=/tmp/foo/.git
+build_cmd=true
+
+[testik]
+path=/home/michal/Documents/Work/Fykos/2012/.git
+build_cmd=make
+build_args=
+
