@@ -1,5 +1,14 @@
 #!/bin/sh
-#/etc/init.d/atrid
+#
+### BEGIN INIT INFO
+# Provides:          astrid
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start astrid at boot time
+# Description:       Enable astrid (simple continuous integration server) services.
+### END INIT INFO
 
 PIDFILE="/tmp/astrid.pid"
 case "$1" in
