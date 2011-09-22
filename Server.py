@@ -11,6 +11,7 @@ from BuilderPage import BuilderPage
 from InfoPage import InfoPage
 
 conffile = os.path.join(os.path.dirname(__file__), 'config.ini')
+repofile = os.path.join(os.path.dirname(__file__), 'repos.ini')
 cherrypy.config.update(conffile)
 rootdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,9 +23,8 @@ class Server(object):
 #                  'tools.staticdir.index' : 'index.html',
     }
     
-    def __init__(self):
-        self.repos = ConfigParser()
-        self.repos.read('repos.ini')
+    def __init__(self, repos):
+        self.repos = repos
 
 
     @cherrypy.expose
@@ -42,10 +42,12 @@ class Server(object):
 
 
 
+repos = ConfigParser()
+repos.read(repofile)
 
-root = Server()
-root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
-root.info = InfoPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
+root = Server(repos)
+root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")), repos)
+root.info = InfoPage(os.path.join(rootdir, cherrypy.config.get("repodir")), repos)
 
 
 #cherrypy.quickstart(root, config=conffile)

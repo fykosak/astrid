@@ -16,9 +16,8 @@ import sys
 class BuilderPage(object):
     lock = threading.Lock()
     
-    def __init__(self, repodir):
-        self.repos = ConfigParser()
-        self.repos.read('repos.ini')
+    def __init__(self, repodir, repos):
+        self.repos = repos
         self.repodir = repodir
 
     @cherrypy.expose
