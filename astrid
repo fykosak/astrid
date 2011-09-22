@@ -4,11 +4,17 @@
 PIDFILE="/tmp/astrid.pid"
 case "$1" in
         start)
-                echo "Starting atrid."
-                su -c "export PYTHONPATH=\"/home/koutny/local/lib/python\"; python /home/koutny/scripts/cis/start.py $PIDFILE;" koutny
+                if [ -f $PIDFILE ] ; then
+                    echo "Already running."
+                    exit 1
+                else                
+                    echo "Starting astrid."
+                    su -c "export PYTHONPATH=\"/home/koutny/local/lib/python\"; python /home/koutny/scripts/cis/start.py $PIDFILE;" koutny
+                fi
                 ;;
         stop)
                 if [ -f $PIDFILE ] ; then
+                    echo "Stopping astrid."
                     kill -9 $(cat $PIDFILE)
                 else
                     echo "Not running."
