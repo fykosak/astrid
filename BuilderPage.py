@@ -61,7 +61,7 @@ class BuilderPage(object):
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
         localpath = os.path.join(self.repodir, reponame)
-        return localpath + ", " remotepath
+        return localpath + ", " + remotepath
         if not os.path.isdir(localpath):
             g = Git()
             g.clone(remotepath, localpath)
