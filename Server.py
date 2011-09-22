@@ -15,7 +15,7 @@ cherrypy.config.update(conffile)
 rootdir = os.path.dirname(os.path.abspath(__file__))
 
 
-class StaticAndDynamic(object):
+class Server(object):
     _cp_config = {'tools.staticdir.on' : True,
                   'tools.staticdir.dir' : os.path.join(rootdir, cherrypy.config.get("repodir")),
                   'tools.staticdir.indexlister': htmldir.htmldir,
@@ -43,9 +43,9 @@ class StaticAndDynamic(object):
 
 
 
-root = StaticAndDynamic()
+root = Server()
 root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
 root.info = InfoPage(os.path.join(rootdir, cherrypy.config.get("repodir")))
 
 
-cherrypy.quickstart(root, config=conffile)
+#cherrypy.quickstart(root, config=conffile)

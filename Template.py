@@ -1,10 +1,11 @@
 import os # template
 import cgi # template
 import re # template
+import os.path
 
 class Template:
     def __init__(self, filename):
-        self.filename = filename
+        self.filename = os.path.join(os.path.dirname(__file__), filename)
         self.includes = {}
         self.data = {}
         
@@ -12,7 +13,7 @@ class Template:
         self.data[name] = str(data)
         
     def render(self):
-        # firstly include files
+        # firstly include files        
         template = open(self.filename).read()
         template = re.sub('\{include ([^\}]*)\}', self._include, template)
         # secondly expand variables
