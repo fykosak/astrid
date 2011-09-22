@@ -2,10 +2,10 @@
 
 if [ $(git rev-parse --is-bare-repository) = true ]
 then
-	REPOSITORY_BASENAME=$(basename $(readlink -nf "$PWD"/..))
+	REPOSITORY_BASENAME=$(basename $(readlink -nf "$PWD"/))
 	REPOSITORY_BASENAME=${REPOSITORY_BASENAME%.git}
 else
-	REPOSITORY_BASENAME=$(basename $(readlink -nf "$PWD"/../..))
+	REPOSITORY_BASENAME=$(basename $(readlink -nf "$PWD"/..))
 fi
 
 echo $REPOSITORY_BASENAME
