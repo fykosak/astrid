@@ -28,7 +28,6 @@ class BuilderPage(object):
         BuilderPage.lock.acquire() # TODO design to lock only manipulated repository
         try:            
             try:
-                return self._updateRepo(reponame)
                 repo = self._updateRepo(reponame)
                 try:
                     if self._build(reponame):
@@ -40,10 +39,11 @@ class BuilderPage(object):
                 except:
                     msg = """#%s Build error.""" % repo.head.commit.hexsha[0:6]
                     msg_class = "red"
+                    raise
             except:
-                msg = "Pull error." 
+                msg = "Pull error."
                 msg_class = "red"
-                #raise
+                raise
             
             
             logger = BuildLogger(self.repodir)
@@ -61,7 +61,6 @@ class BuilderPage(object):
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
         localpath = os.path.join(self.repodir, reponame)
-        return localpath + ", " + remotepath
         if not os.path.isdir(localpath):
             g = Git()
             g.clone(remotepath, localpath)
