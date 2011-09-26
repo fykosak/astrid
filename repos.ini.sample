@@ -1,4 +1,5 @@
 [fykos25]
 path=/home/fksgit/data/fykos25.git
 build_cmd=make
+build_args=all -B
 
