@@ -25,3 +25,4 @@ Authorization: Basic $AUTH\r
 " 
 #echo -ne "$REQUEST" | netcat -q 1 ${HOST/:/ }
 echo -ne "$REQUEST" | /bin/nc.traditional -q 1 ${HOST/:/ }
+echo "Rebuild request sent."
