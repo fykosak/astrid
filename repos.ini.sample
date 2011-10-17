@@ -1,5 +1,10 @@
 [fykos25]
 path=/home/fksgit/data/fykos25.git
 build_cmd=make
-build_args=all -B
+build_args=all 
+
+[vyfuk1]
+path=/home/fksgit/data/vyfuk1.git
+build_cmd=make
+build_args=all 
 

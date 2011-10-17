@@ -15,7 +15,7 @@ PWD=pwd
 
 AUTH=$(echo -n "$USER:$PWD" | base64)
 
-HOST="localhost:8000"
+HOST="localhost:8080"
 PATH="/build/$REPOSITORY_BASENAME"
 
 REQUEST="HEAD $PATH HTTP/1.0\r

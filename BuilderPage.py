@@ -67,6 +67,7 @@ class BuilderPage(object):
             repo = Repo(localpath)
         else:
             repo = Repo(localpath)
+            repo.head.reset(index=True, working_tree=True)
             repo.remotes.origin.pull()
         return repo
         
