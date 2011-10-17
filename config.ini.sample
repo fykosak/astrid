@@ -5,6 +5,7 @@ server.thread_pool = 10
 tools.auth_basic.on: True
 tools.auth_basic.realm: 'Astrid authorization'
 tools.auth_basic.checkpassword: cherrypy.lib.auth_basic.checkpassword_dict({'user': 'passwd'})
+tools.expires.sec = 0
 repodir = 'data'
 
 [/style.css]
