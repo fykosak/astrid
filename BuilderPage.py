@@ -68,6 +68,7 @@ class BuilderPage(object):
         else:
             repo = Repo(localpath)
             repo.head.reset(index=True, working_tree=True)
+            repo.git.clean("-f")
             repo.remotes.origin.pull()
         return repo
         
