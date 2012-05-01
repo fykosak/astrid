@@ -1,6 +1,18 @@
+[fykos26]
+path=/home/fksgit/data/fykos26.git
+users=fykos,repo
+build_cmd=make
+build_args=all 
+
 [fykos25]
 path=/home/fksgit/data/fykos25.git
 users=fykos,repo
+build_cmd=make
+build_args=all 
+
+[vyfuk2]
+path=/home/fksgit/data/vyfuk2.git
+users=fykos,vyfuk,repo
 build_cmd=make
 build_args=all 
 
