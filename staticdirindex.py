@@ -4,8 +4,8 @@ import stat
 import urllib
 import cherrypy
 from cherrypy.lib import cptools, http
-from htmlfile import htmlfile
 
+repos = None
 # Undercover kludge to wrap staticdir
 from cherrypy.lib.static import staticdir
 
@@ -32,6 +32,15 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
 """
     req = cherrypy.request
     response = cherrypy.response
+    
+    user = req.login
+    reponame = req.path_info.split("/")[1]
+    if reponame not in repos.sections():
+            raise cherrypy.HTTPError(404)
+        
+    if user not in repos.get(reponame, "users"):
+        raise cherrypy.HTTPError(401)
+
 
     match = indexlistermatch
 

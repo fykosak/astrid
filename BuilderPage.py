@@ -10,20 +10,19 @@ from ConfigParser import ConfigParser
 
 from BuildLogger import BuildLogger
 from Template import Template
+from BasePage import BasePage
 
 import sys
 
-class BuilderPage(object):
+class BuilderPage(BasePage):
     lock = threading.Lock()
     
-    def __init__(self, repodir, repos):
-        self.repos = repos
-        self.repodir = repodir
-
     @cherrypy.expose
     def default(self, reponame):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
+        
+        self._checkAccess(reponame)
         
         BuilderPage.lock.acquire() # TODO design to lock only manipulated repository
         try:            

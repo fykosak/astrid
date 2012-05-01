@@ -6,17 +6,16 @@ from ConfigParser import ConfigParser
 
 from BuildLogger import BuildLogger
 from Template import Template
+from BasePage import BasePage
 
-
-class InfoPage(object):
-    def __init__(self, repodir, repos):
-        self.repos = repos
-        self.repodir = repodir
+class InfoPage(BasePage):
 
     @cherrypy.expose
     def default(self, reponame):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
+        
+        self._checkAccess(reponame)
         
         logger = BuildLogger(self.repodir)
         

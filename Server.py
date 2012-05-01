@@ -3,7 +3,6 @@ import os.path
 import cherrypy.lib.auth_basic
 
 import htmldir
-import staticdirindex
 
 from Template import Template
 from ConfigParser import ConfigParser
@@ -31,10 +30,14 @@ class Server(object):
     def index(self, **params):
         template = Template('templates/home.html')
         repos = ""
+        user = cherrypy.request.login
         for section in self.repos.sections():
-            repos += """<li><a href="%s">%s</a> (<a href="info/%s">info</a>)</li>""" % (section, section, section,)
+            if user in self.repos.get(section, "users").split(","):
+                repos += """<li><a href="%s">%s</a> (<a href="info/%s">info</a>)</li>""" % (section, section, section,)
+                
         template.assignData("pagetitle", "FKS repos")
         template.assignData("repos", repos)
+        template.assignData("user", user)
         return template.render()
         
 
@@ -44,6 +47,9 @@ class Server(object):
 
 repos = ConfigParser()
 repos.read(repofile)
+
+import staticdirindex
+staticdirindex.repos = repos
 
 root = Server(repos)
 root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")), repos)

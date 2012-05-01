@@ -1,10 +1,12 @@
 [fykos25]
 path=/home/fksgit/data/fykos25.git
+users=fykos,repo
 build_cmd=make
 build_args=all 
 
 [vyfuk1]
 path=/home/fksgit/data/vyfuk1.git
+users=fykos,vyfuk,repo
 build_cmd=make
 build_args=all 
 
