@@ -35,11 +35,12 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     
     user = req.login
     reponame = req.path_info.split("/")[1]
-    if reponame not in repos.sections():
-            raise cherrypy.HTTPError(404)
-        
-    if user not in repos.get(reponame, "users"):
-        raise cherrypy.HTTPError(401)
+    if reponame not in ["info", "build"]:
+        if reponame not in repos.sections():
+                raise cherrypy.HTTPError(404)
+            
+        if user not in repos.get(reponame, "users"):
+            raise cherrypy.HTTPError(401)
 
 
     match = indexlistermatch
