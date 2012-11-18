@@ -72,11 +72,12 @@ class BuilderPage(BasePage):
         return repo
         
     def _build(self, reponame):
+        usr = self.repos.get(reponame, "build_usr")
         cmd = self.repos.get(reponame, "build_cmd")
         args = self.repos.get(reponame, "build_args")
         cwd = os.path.join(self.repodir, reponame)
         
-        p = subprocess.Popen([cmd] + shlex.split(args), cwd=cwd)
+        p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd)
         p.wait()        
         return p.returncode == 0
         
