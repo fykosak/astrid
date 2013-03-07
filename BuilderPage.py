@@ -77,7 +77,8 @@ class BuilderPage(BasePage):
         args = self.repos.get(reponame, "build_args")
         cwd = os.path.join(self.repodir, reponame)
         
-        p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd)
+	logfile = open("/tmp/astrid.%s.build.log" % reponame, "w")
+        p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile)
         p.wait()        
         return p.returncode == 0
         
