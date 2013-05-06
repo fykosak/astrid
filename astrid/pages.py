@@ -4,15 +4,25 @@ import os
 import subprocess
 import shlex
 import threading
+import sys
 
 from git import Repo, Git
 from ConfigParser import ConfigParser
 
-from BuildLogger import BuildLogger
-from Template import Template
-from BasePage import BasePage
+from astrid import BuildLogger
+from astrid.templating import Template
+import astrid.server
 
-import sys
+class BasePage(object):
+    def __init__(self, repodir, repos):
+        self.repos = repos
+        self.repodir = repodir
+    
+    def _checkAccess(self, reponame):
+        user = cherrypy.request.login
+        if user not in self.repos.get(reponame, "users"):
+            raise cherrypy.HTTPError(401)
+        
 
 class BuilderPage(BasePage):
     lock = threading.Lock()
@@ -77,8 +87,68 @@ class BuilderPage(BasePage):
         args = self.repos.get(reponame, "build_args")
         cwd = os.path.join(self.repodir, reponame)
         
-	logfile = open("/tmp/astrid.%s.build.log" % reponame, "w")
+        logfile = open("/tmp/astrid.%s.build.log" % reponame, "w")
         p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile)
         p.wait()        
         return p.returncode == 0
         
+class InfoPage(BasePage):
+
+    @cherrypy.expose
+    def default(self, reponame):
+        if reponame not in self.repos.sections():
+            raise cherrypy.HTTPError(404)
+        
+        self._checkAccess(reponame)
+        
+        logger = BuildLogger(self.repodir)
+        
+        msg = "<table><tr><th>Time</th><th>Message</th><th>User</th></tr>"
+        for record in logger.getLogs(reponame):
+            record += ['']*(3-len(record))
+            msg += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % (record[0], record[1],record[2],)
+        msg += "</table>"
+        
+        template = Template("templates/info.html")
+        template.assignData("reponame", reponame)
+        template.assignData("messages", msg)        
+        template.assignData("pagetitle", reponame + " info")
+        
+        return template.render()
+
+class DashboardPage(object):
+    _cp_config = {'tools.staticdir.on' : True,
+                  'tools.staticdir.dir' : os.path.join(astrid.rootdir, cherrypy.config.get("repodir")),
+                  'tools.staticdir.indexlister': astrid.server.htmldir,
+#                  'tools.staticdir.index' : 'index.html',
+    }
+    
+    def __init__(self, repos):
+        self.repos = repos
+
+
+    @cherrypy.expose
+    def index(self, **params):
+        template = Template('templates/home.html')
+        repos = ""
+        user = cherrypy.request.login
+
+        for section in self.repos.sections():
+            if user in self.repos.get(section, "users").split(","):
+                repos += """<li><a href="%s">%s</a> (<a href="info/%s">info</a>)</li>""" % (section, section, section,)
+                
+        template.assignData("pagetitle", "Astrid")
+        template.assignData("repos", repos)
+        template.assignData("user", user)
+        return template.render()
+        
+
+    index._cp_config = {'tools.staticdir.on': False}
+
+
+
+
+
+
+
+

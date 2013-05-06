@@ -1,5 +1,7 @@
-﻿import cherrypy
-import Server
+﻿#!python
+
+import cherrypy
+import astrid
 import sys
 
 from cherrypy.process.plugins import Daemonizer
@@ -11,9 +13,9 @@ if len(sys.argv) < 2:
     sys.exit(1)
     
 # before mounting anything
-Daemonizer(cherrypy.engine).subscribe()
-PIDFile(cherrypy.engine, pidfile=sys.argv[1]).subscribe()
+#Daemonizer(cherrypy.engine).subscribe()
+#PIDFile(cherrypy.engine, pidfile=sys.argv[1]).subscribe()
 
-cherrypy.tree.mount(Server.root, "/", config=Server.conffile)
+cherrypy.tree.mount(astrid.root, "/", config=astrid.conffile)
 cherrypy.engine.start()
 cherrypy.engine.block()

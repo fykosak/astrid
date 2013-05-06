@@ -28,4 +28,23 @@ class BuildLogger:
             return records
         except:
             return []
-        
+
+from ConfigParser import ConfigParser
+
+conffile = os.path.join(os.path.dirname(__file__), '../config.ini')
+repofile = os.path.join(os.path.dirname(__file__), '../repos.ini')
+
+repos = ConfigParser()
+repos.read(repofile)
+
+cherrypy.config.update(conffile)
+rootdir = os.path.dirname(os.path.abspath(__file__))
+
+
+from astrid.pages import BuilderPage, InfoPage, DashboardPage
+
+root = DashboardPage(repos)
+root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")), repos)
+root.info = InfoPage(os.path.join(rootdir, cherrypy.config.get("repodir")), repos)
+
+       

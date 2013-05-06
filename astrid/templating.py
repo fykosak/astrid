@@ -1,6 +1,6 @@
-import os # template
-import cgi # template
-import re # template
+import os
+import cgi
+import re
 import os.path
 
 class Template:

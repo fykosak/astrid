@@ -10,4 +10,4 @@ repodir = 'data'
 
 [/style.css]
 tools.staticfile.on = True
-tools.staticfile.filename = os.path.join(os.path.abspath("."), "style.css")
+tools.staticfile.filename = os.path.join(os.path.abspath("."), "astrid/static/style.css")
