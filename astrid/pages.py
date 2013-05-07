@@ -70,15 +70,28 @@ class BuilderPage(BasePage):
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
         localpath = os.path.join(self.repodir, reponame)
+
+        os.umask(0o007) # create repo content not readable to others
         if not os.path.isdir(localpath):
             g = Git()
             g.clone(remotepath, localpath)
+
+            # not-working umask workaround
+            p = subprocess.Popen(["chmod", "g+w", localpath])
+            p.wait()        
+
             repo = Repo(localpath)
         else:
             repo = Repo(localpath)
             repo.head.reset(index=True, working_tree=True)
             repo.git.clean("-f")
             repo.remotes.origin.pull()
+
+        # now set correct group (same as build user)
+        usr = self.repos.get(reponame, "build_usr")
+        p = subprocess.Popen(["chgrp", usr, "-R", localpath])
+        p.wait()        
+
         return repo
         
     def _build(self, reponame):
