@@ -102,7 +102,7 @@ class BuilderPage(BasePage):
         
         logfilename = os.path.expanduser("~/.astrid/%s.build.log" % reponame)
         logfile = open(logfilename, "w")
-        p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile)
+        p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile, stdin=open("/dev/null"))
         p.wait()        
         return p.returncode == 0
         
