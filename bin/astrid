@@ -3,18 +3,20 @@
 import cherrypy
 import astrid
 import sys
+import os
 
 from cherrypy.process.plugins import Daemonizer
 from cherrypy.process.plugins import PIDFile
 
-print sys.argv
 if len(sys.argv) < 2:
-    print "Specify pid file."
-    sys.exit(1)
-    
-# before mounting anything
-#Daemonizer(cherrypy.engine).subscribe()
-#PIDFile(cherrypy.engine, pidfile=sys.argv[1]).subscribe()
+    pidfile = os.path.expanduser("~/.astrid/pidfile")
+else:
+    pidfile = sys.argv[1]
+
+print("Using pidfile %s" % pidfile)
+
+Daemonizer(cherrypy.engine).subscribe()
+PIDFile(cherrypy.engine, pidfile=pidfile).subscribe()
 
 cherrypy.tree.mount(astrid.root, "/", config=astrid.config)
 cherrypy.engine.start()
