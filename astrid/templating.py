@@ -2,10 +2,11 @@ import os
 import cgi
 import re
 import os.path
+import pkg_resources
 
 class Template:
     def __init__(self, filename):
-        self.filename = os.path.join(os.path.dirname(__file__), filename)
+        self.filename = filename
         self.includes = {}
         self.data = {}
         
@@ -14,7 +15,7 @@ class Template:
         
     def render(self):
         # firstly include files        
-        template = open(self.filename).read()
+        template = pkg_resources.resource_stream('astrid', self.filename).read()
         template = re.sub('\{include ([^\}]*)\}', self._include, template)
         # secondly expand variables
         return re.sub('\{(!)?([^\}]*)\}', self._expand, template)
@@ -22,10 +23,10 @@ class Template:
     def _include(self, mo):
         filename = os.path.dirname(self.filename) + "/" + mo.group(1)
         if filename not in self.includes:
-            if not os.path.exists(filename):
+            f = pkg_resources.resource_stream('astrid', filename)
+            if not f:
                 self.includes[filename] = "NOT FOUND"
             else:
-                f = open(filename)
                 self.includes[filename] = f.read()
                 f.close()
         

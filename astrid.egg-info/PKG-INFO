@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: astrid
+Version: 0.2dev
+Summary: Minimalistic continous integration
+Home-page: UNKNOWN
+Author: Michal Koutný
+Author-email: michal@fykos.cz
+License: WTFPL
+Description: UNKNOWN
+Keywords: Git build continous integration
+Platform: UNKNOWN

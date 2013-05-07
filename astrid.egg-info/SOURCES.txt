@@ -1,0 +1,14 @@
+setup.cfg
+setup.py
+astrid/__init__.py
+astrid/pages.py
+astrid/server.py
+astrid/templating.py
+astrid.egg-info/PKG-INFO
+astrid.egg-info/SOURCES.txt
+astrid.egg-info/dependency_links.txt
+astrid.egg-info/entry_points.txt
+astrid.egg-info/not-zip-safe
+astrid.egg-info/requires.txt
+astrid.egg-info/top_level.txt
+bin/astrid

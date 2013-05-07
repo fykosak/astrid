@@ -11,7 +11,7 @@ fi
 echo $REPOSITORY_BASENAME
 
 USER=user
-PWD=pwd
+PWD=passwd
 
 AUTH=$(echo -n "$USER:$PWD" | base64)
 

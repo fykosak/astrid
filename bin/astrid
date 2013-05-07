@@ -16,6 +16,6 @@ if len(sys.argv) < 2:
 #Daemonizer(cherrypy.engine).subscribe()
 #PIDFile(cherrypy.engine, pidfile=sys.argv[1]).subscribe()
 
-cherrypy.tree.mount(astrid.root, "/", config=astrid.conffile)
+cherrypy.tree.mount(astrid.root, "/", config=astrid.config)
 cherrypy.engine.start()
 cherrypy.engine.block()

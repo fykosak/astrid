@@ -118,7 +118,7 @@ class InfoPage(BasePage):
 
 class DashboardPage(object):
     _cp_config = {'tools.staticdir.on' : True,
-                  'tools.staticdir.dir' : os.path.join(astrid.rootdir, cherrypy.config.get("repodir")),
+                  'tools.staticdir.dir' : cherrypy.config.get("repodir"),
                   'tools.staticdir.indexlister': astrid.server.htmldir,
 #                  'tools.staticdir.index' : 'index.html',
     }

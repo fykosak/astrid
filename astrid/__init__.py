@@ -31,20 +31,17 @@ class BuildLogger:
 
 from ConfigParser import ConfigParser
 
-conffile = os.path.join(os.path.dirname(__file__), '../config.ini')
-repofile = os.path.join(os.path.dirname(__file__), '../repos.ini')
-
 repos = ConfigParser()
-repos.read(repofile)
+repos.read(os.path.expanduser('~/.astrid/repos.ini'))
 
-cherrypy.config.update(conffile)
-rootdir = os.path.dirname(os.path.abspath(__file__))
+config = os.path.expanduser('~/.astrid/config.ini')
+cherrypy.config.update(config)
 
 
 from astrid.pages import BuilderPage, InfoPage, DashboardPage
 
 root = DashboardPage(repos)
-root.build = BuilderPage(os.path.join(rootdir, cherrypy.config.get("repodir")), repos)
-root.info = InfoPage(os.path.join(rootdir, cherrypy.config.get("repodir")), repos)
+root.build = BuilderPage(cherrypy.config.get("repodir"), repos)
+root.info = InfoPage(cherrypy.config.get("repodir"), repos)
 
        
