@@ -1,0 +1,17 @@
+About
+=====
+Astrid is minimalistic content integration server. It tracks Git repositories
+can run build tasks on them and expose the built repositories on the web. It's
+important that Astrid separate to isolate its users' access rights.
+
+Installation
+============
+
+Quickest way is to install Astrid from Python egg (run `python setup.py
+bdist_egg` to build the egg) on the destination machine.
+
+After egg installation, copy configuration files located in 'config' directory
+into '~/.astrid' and strip the '.sample' extension.
+
+Eventually edit the settings for your site.
+
