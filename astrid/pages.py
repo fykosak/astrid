@@ -14,9 +14,10 @@ from astrid.templating import Template
 import astrid.server
 
 class BasePage(object):
-    def __init__(self, repodir, repos):
+    def __init__(self, repodir, repos, locks):
         self.repos = repos
         self.repodir = repodir
+        self.locks = locks
     
     def _checkAccess(self, reponame):
         user = cherrypy.request.login
@@ -25,7 +26,6 @@ class BasePage(object):
         
 
 class BuilderPage(BasePage):
-    lock = threading.Lock()
     
     @cherrypy.expose
     def default(self, reponame):
@@ -33,8 +33,9 @@ class BuilderPage(BasePage):
             raise cherrypy.HTTPError(404)
         
         self._checkAccess(reponame)
+        lock = self.locks[reponame]
         
-        BuilderPage.lock.acquire() # TODO design to lock only manipulated repository
+        lock.acquire()
         try:            
             try:
                 repo = self._updateRepo(reponame)
@@ -65,7 +66,7 @@ class BuilderPage(BasePage):
             template.assignData("pagetitle", "Build")
             return template.render()
         finally:
-            BuilderPage.lock.release()            
+            lock.release()            
     
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
@@ -140,8 +141,9 @@ class DashboardPage(object):
 #                  'tools.staticdir.index' : 'index.html',
     }
     
-    def __init__(self, repos):
+    def __init__(self, repos, locks):
         self.repos = repos
+        self.locks = locks
 
 
     @cherrypy.expose
@@ -150,9 +152,15 @@ class DashboardPage(object):
         repos = ""
         user = cherrypy.request.login
 
-        for section in self.repos.sections():
+        for section in self.repos.sections():            
             if user in self.repos.get(section, "users").split(","):
-                repos += """<li><a href="%s">%s</a> (<a href="info/%s">info</a>)</li>""" % (section, section, section,)
+                # get the state of the repo by trying acquire its lock
+                lock = self.locks[section]
+                building = not lock.acquire(False)
+                if not building: # repo's not building, we release the lock
+                    lock.release()
+                building = ', building&hellip;' if building else ''
+                repos += """<li><a href="%s">%s</a> (<a href="info/%s">info</a>%s)</li>""" % (section, section, section,building,)
                 
         template.assignData("pagetitle", "Astrid")
         template.assignData("repos", repos)

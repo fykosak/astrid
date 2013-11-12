@@ -1,5 +1,6 @@
 from datetime import datetime
 import cherrypy
+import threading
 import os.path
 
 class BuildLogger:
@@ -37,11 +38,13 @@ repos.read(os.path.expanduser('~/.astrid/repos.ini'))
 config = os.path.expanduser('~/.astrid/config.ini')
 cherrypy.config.update(config)
 
+# prepare locks for each repository
+locks = {section: threading.Lock() for section in repos.sections()}
 
 from astrid.pages import BuilderPage, InfoPage, DashboardPage
 
-root = DashboardPage(repos)
-root.build = BuilderPage(cherrypy.config.get("repodir"), repos)
-root.info = InfoPage(cherrypy.config.get("repodir"), repos)
+root = DashboardPage(repos, locks)
+root.build = BuilderPage(cherrypy.config.get("repodir"), repos, locks)
+root.info = InfoPage(cherrypy.config.get("repodir"), repos, locks)
 
        
