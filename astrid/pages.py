@@ -83,8 +83,8 @@ class BuilderPage(BasePage):
             repo = Repo(localpath)
         else:
             repo = Repo(localpath)
+            repo.git.update_index("--refresh") # git update-index --refresh
             repo.head.reset(index=True, working_tree=True)
-            repo.git.clean("-f")
             repo.remotes.origin.pull()
 
         # now set correct group (same as build user)
@@ -158,7 +158,6 @@ class DashboardPage(object):
         
 
     index._cp_config = {'tools.staticdir.on': False}
-
 
 
 
