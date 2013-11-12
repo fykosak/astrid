@@ -6,7 +6,7 @@ import shlex
 import threading
 import sys
 
-from git import Repo, Git
+from git import Repo, Git, GitCommandError
 from ConfigParser import ConfigParser
 
 from astrid import BuildLogger
@@ -83,8 +83,11 @@ class BuilderPage(BasePage):
             repo = Repo(localpath)
         else:
             repo = Repo(localpath)
-            repo.git.update_index("--refresh") # git update-index --refresh
-            repo.head.reset(index=True, working_tree=True)
+            try:
+                repo.git.update_index("--refresh")
+            except GitCommandError:
+                pass # it's fine, we'll checkout
+            repo.git.checkout()
             repo.remotes.origin.pull()
 
         # now set correct group (same as build user)
