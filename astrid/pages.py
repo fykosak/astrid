@@ -5,6 +5,7 @@ import subprocess
 import shlex
 import threading
 import sys
+import time
 
 from git import Repo, Git, GitCommandError
 from ConfigParser import ConfigParser
@@ -38,11 +39,14 @@ class BuilderPage(BasePage):
         lock.acquire()
         try:            
             try:
+                time_start = time.time()
+                time_end = None
                 repo = self._updateRepo(reponame)
                 try:
                     if self._build(reponame):
                         msg = """#%s Build succeeded.""" % repo.head.commit.hexsha[0:6]
                         msg_class = "green"
+                        time_end = time.time()
                     else:
                         msg = """#%s Build failed.""" % repo.head.commit.hexsha[0:6]
                         msg_class = "red"
@@ -55,7 +59,9 @@ class BuilderPage(BasePage):
                 msg_class = "red"
                 raise
             
-            
+            if time_end != None:
+                msg += " ({:.2f} s)".format(time_end - time_start)
+
             logger = BuildLogger(self.repodir)
             logger.log(reponame, msg)
             

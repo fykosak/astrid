@@ -16,7 +16,7 @@ class BuildLogger:
         logfile = self._getLogfile(reponame)
         f = open(logfile, "a")
         user = cherrypy.request.login
-        f.write(BuildLogger.separator.join([str(datetime.now()), message, user]) + "\n")
+        f.write(BuildLogger.separator.join([datetime.now().isoformat(' '), message, user]) + "\n")
         f.close()
     
     def getLogs(self, reponame):

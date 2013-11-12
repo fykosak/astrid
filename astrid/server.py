@@ -41,7 +41,7 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
                 continue
             fdn = os.path.join( dpath, dn )
             dmtime = os.path.getmtime( fdn )
-            dtim = datetime.datetime.fromtimestamp( dmtime ).isoformat('-')
+            dtim = datetime.datetime.fromtimestamp( dmtime ).isoformat(' ')
             fh += """<tr><td><a href="%s">%s/</a></td><td>%s</td><td>%s</td></tr>""" % ( dn + '/',  dn, "", dtim,)
 
         del ddirs[:] # limit to one level
@@ -52,7 +52,7 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
             fn = os.path.join( dpath, fil )
             siz = os.path.getsize( fn )
             fmtime = os.path.getmtime( fn )
-            ftim = datetime.datetime.fromtimestamp( fmtime ).isoformat('-')
+            ftim = datetime.datetime.fromtimestamp( fmtime ).isoformat(' ')
             fh += """<tr><td><a href="%s">%s</a></td><td>%s</td><td>%s</td></tr>""" % ( fil, fil, str(siz), ftim, )
 
     fh += '</table>'
