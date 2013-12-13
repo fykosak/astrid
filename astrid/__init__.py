@@ -10,7 +10,7 @@ class BuildLogger:
         self.repodir = repodir
         
     def _getLogfile(self, reponame):
-        return os.path.join(self.repodir, reponame, ".log")
+        return os.path.expanduser('~/.astrid/{}.log'.format(reponame))
         
     def log(self, reponame, message):
         logfile = self._getLogfile(reponame)
