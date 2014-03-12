@@ -22,7 +22,8 @@ setup(name='astrid',
           'cherrypy'
       ],
       scripts=[
-          'bin/astrid'
+          'bin/astrid',
+          'bin/touch-astrid.sample'
       ],
       package_dir={
           'astrid': 'astrid'

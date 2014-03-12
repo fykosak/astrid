@@ -15,3 +15,9 @@ into '~/.astrid' and strip the '.sample' extension.
 
 Eventually edit the settings for your site.
 
+Run
+===
+Start Astrid with script 'bin/astrid', it will spawn a background process.
+
+Configure post-receive hook in your Git repository to let Astrid know about
+incoming updates. Sample hook is in 'bin/touch-astrid'.
