@@ -1,7 +1,13 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.3.3'
+if len(sys.argv) < 3:
+    sys.stderr.write("Missing 2nd argument 'version'.\n")
+    sys.exit(1)
+else:
+    version = sys.argv[1]
+    del sys.argv[1]
+
 
 setup(name='astrid',
       version=version,
