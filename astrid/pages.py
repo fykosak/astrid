@@ -96,7 +96,7 @@ class BuilderPage(BasePage):
                 pass # it's fine, we'll checkout
             # We use wrapped API (direct git command calls) rather than calling semantic GitPython API.
             # (e.g. repo.remotes.origin.pull() was replaced by repo.git.pull("origin"))
-            repo.git.checkout()
+            repo.git.checkout(".")
             repo.git.clean("-f")
             repo.git.pull("origin")
 
