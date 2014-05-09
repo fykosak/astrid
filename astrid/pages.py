@@ -35,6 +35,7 @@ class BuilderPage(BasePage):
         
         self._checkAccess(reponame)
         lock = self.locks[reponame]
+        msg = None
         
         lock.acquire()
         try:            
@@ -54,16 +55,14 @@ class BuilderPage(BasePage):
                     msg = """#%s Build error.""" % repo.head.commit.hexsha[0:6]
                     msg_class = "red"
                     raise
-            except:
-                msg = "Pull error."
+            except GitCommandError as e:
+                msg = "Pull error. (" + str(e) + ")"
                 msg_class = "red"
                 raise
             
             if time_end != None:
                 msg += " ({:.2f} s)".format(time_end - time_start)
 
-            logger = BuildLogger(self.repodir)
-            logger.log(reponame, msg)
             
             template = Template("templates/build.html")
             template.assignData("reponame", reponame)
@@ -72,6 +71,8 @@ class BuilderPage(BasePage):
             template.assignData("pagetitle", "Build")
             return template.render()
         finally:
+            logger = BuildLogger(self.repodir)
+            logger.log(reponame, msg)
             lock.release()            
     
     def _updateRepo(self, reponame):
