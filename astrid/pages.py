@@ -94,11 +94,11 @@ class BuilderPage(BasePage):
             try:
                 repo.git.update_index("--refresh")
             except GitCommandError:
-                pass # it's fine, we'll checkout
+                pass # it's fine, we'll reset
             # We use wrapped API (direct git command calls) rather than calling semantic GitPython API.
             # (e.g. repo.remotes.origin.pull() was replaced by repo.git.pull("origin"))
-            repo.git.checkout()
-            repo.git.clean("-f")
+            repo.git.reset("--hard", "master")
+            #repo.git.clean("-f")
             repo.git.pull("origin")
 
         # now set correct group (same as build user)
