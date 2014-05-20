@@ -77,6 +77,7 @@ class BuilderPage(BasePage):
     
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
+        submodules = self.repos.get(reponame, "submodules") if self.repos.has_option(reponame, "submodules") else False
         localpath = os.path.join(self.repodir, reponame)
 
         os.umask(0o007) # create repo content not readable to others
@@ -84,11 +85,14 @@ class BuilderPage(BasePage):
             g = Git()
             g.clone(remotepath, localpath)
 
+            repo = Repo(localpath)
+
+            if submodules:
+                repo.git.submodules("init")
+
             # not-working umask workaround
             p = subprocess.Popen(["chmod", "g+w", localpath])
             p.wait()        
-
-            repo = Repo(localpath)
         else:
             repo = Repo(localpath)
             try:
@@ -100,6 +104,10 @@ class BuilderPage(BasePage):
             repo.git.reset("--hard", "master")
             #repo.git.clean("-f")
             repo.git.pull("origin")
+
+            if submodules:
+                repo.git.submodules("init")
+                repo.git.submodules("update")
 
         # now set correct group (same as build user)
         usr = self.repos.get(reponame, "build_usr")
