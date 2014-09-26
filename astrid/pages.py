@@ -88,7 +88,7 @@ class BuilderPage(BasePage):
             repo = Repo(localpath)
 
             if submodules:
-                repo.git.submodules("init")
+                repo.git.submodule("init")
 
             # not-working umask workaround
             p = subprocess.Popen(["chmod", "g+w", localpath])
@@ -106,8 +106,9 @@ class BuilderPage(BasePage):
             repo.git.pull("origin")
 
             if submodules:
-                repo.git.submodules("init")
-                repo.git.submodules("update")
+                repo.git.submodule("init")
+                repo.git.submodule("foreach", "git", "fetch")
+                repo.git.submodule("update")
 
         # now set correct group (same as build user)
         usr = self.repos.get(reponame, "build_usr")
