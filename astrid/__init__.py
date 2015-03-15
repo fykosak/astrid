@@ -1,7 +1,10 @@
 from datetime import datetime
+from email.mime.text import MIMEText
+
 import cherrypy
-import threading
 import os.path
+import smtplib
+import threading
 
 class BuildLogger:
     separator = ";"
@@ -12,12 +15,15 @@ class BuildLogger:
     def _getLogfile(self, reponame):
         return os.path.expanduser('~/.astrid/{}.log'.format(reponame))
         
-    def log(self, reponame, message):
+    def log(self, reponame, message, sendMail = False):
         logfile = self._getLogfile(reponame)
         f = open(logfile, "a")
         user = cherrypy.request.login
         f.write(BuildLogger.separator.join([datetime.now().isoformat(' '), message, user]) + "\n")
         f.close()
+    
+        if sendMail:
+            self._sendMail(reponame, message)
     
     def getLogs(self, reponame):
         logfile = self._getLogfile(reponame)
@@ -29,6 +35,23 @@ class BuildLogger:
             return records
         except:
             return []
+
+    def _sendMail(self, reponame, message):
+        headerFrom = cherrypy.config.get("mail_from")
+        headerTo = cherrypy.config.get("mail_to")
+
+        msg = MIMEText(message)
+        msg['Subject'] = 'Astrid coughed on repo %s' % reponame
+        msg['From'] = headerFrom
+        msg['To'] = headerTo
+
+        try:
+            s = smtplib.SMTP('localhost')
+            s.sendmail(headerFrom, [headerTo], msg.as_string())
+            s.quit()
+        except:
+            pass
+
 
 from ConfigParser import ConfigParser
 

@@ -36,6 +36,7 @@ class BuilderPage(BasePage):
         self._checkAccess(reponame)
         lock = self.locks[reponame]
         msg = None
+        sendMail = False
         
         lock.acquire()
         try:            
@@ -58,6 +59,7 @@ class BuilderPage(BasePage):
             except GitCommandError as e:
                 msg = "Pull error. (" + str(e) + ")"
                 msg_class = "red"
+                sendMail = True
                 raise
             
             if time_end != None:
@@ -72,7 +74,7 @@ class BuilderPage(BasePage):
             return template.render()
         finally:
             logger = BuildLogger(self.repodir)
-            logger.log(reponame, msg)
+            logger.log(reponame, msg, sendMail)
             lock.release()            
     
     def _updateRepo(self, reponame):
