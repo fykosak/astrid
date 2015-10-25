@@ -90,7 +90,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     
     user = req.login
     reponame = req.path_info.split("/")[1]
-    if reponame not in ["info", "build"]:
+    if reponame not in ["info", "build", "buildlog"]:
         if reponame not in astrid.repos.sections():
                 raise cherrypy.HTTPError(404)
             

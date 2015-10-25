@@ -24,6 +24,13 @@ class BasePage(object):
         user = cherrypy.request.login
         if user not in self.repos.get(reponame, "users"):
             raise cherrypy.HTTPError(401)
+
+    def _isBuilding(self, reponame):
+        lock = self.locks[reponame]
+        building = not lock.acquire(False)
+        if not building: # repo's not building, we release the lock
+            lock.release()
+        return building
         
 
 class BuilderPage(BasePage):
@@ -143,9 +150,15 @@ class InfoPage(BasePage):
         logger = BuildLogger(self.repodir)
         
         msg = "<table><tr><th>Time</th><th>Message</th><th>User</th></tr>"
+        first = True
         for record in logger.getLogs(reponame):
             record += ['']*(3-len(record))
-            msg += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % (record[0], record[1],record[2],)
+            if first:
+                msg += """<tr><td>%s</td><td><a href="../buildlog/%s">%s</a></td><td>%s</td></tr>""" % (record[0], reponame, record[1],record[2],)
+                first = False
+            else:
+                msg += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % (record[0], record[1],record[2],)
+            
         msg += "</table>"
         
         template = Template("templates/info.html")
@@ -158,18 +171,36 @@ class InfoPage(BasePage):
         
         return template.render()
 
-class DashboardPage(object):
+class BuildlogPage(BasePage):
+
+    @cherrypy.expose
+    def default(self, reponame):
+        if reponame not in self.repos.sections():
+            raise cherrypy.HTTPError(404)
+        
+        self._checkAccess(reponame)
+        
+        logger = BuildLogger(self.repodir)
+        building = self._isBuilding(reponame)
+        building = ', building&hellip;' if building else ''
+ 
+        template = Template("templates/buildlog.html")
+        template.assignData("reponame", reponame)
+        template.assignData("building", building)
+        template.assignData("buildlog", logger.getBuildlog(reponame))
+
+        template.assignData("pagetitle", reponame + " build log")
+        
+        return template.render()
+
+
+class DashboardPage(BasePage):
     _cp_config = {'tools.staticdir.on' : True,
                   'tools.staticdir.dir' : cherrypy.config.get("repodir"),
                   'tools.staticdir.indexlister': astrid.server.htmldir,
 #                  'tools.staticdir.index' : 'index.html',
     }
     
-    def __init__(self, repos, locks):
-        self.repos = repos
-        self.locks = locks
-
-
     @cherrypy.expose
     def index(self, **params):
         template = Template('templates/home.html')
@@ -178,11 +209,7 @@ class DashboardPage(object):
 
         for section in self.repos.sections():            
             if user in self.repos.get(section, "users").split(","):
-                # get the state of the repo by trying acquire its lock
-                lock = self.locks[section]
-                building = not lock.acquire(False)
-                if not building: # repo's not building, we release the lock
-                    lock.release()
+                building = self._isBuilding(section)
                 building = ', building&hellip;' if building else ''
                 repos += """<li><a href="%s">%s</a> (<a href="info/%s">info</a>%s)</li>""" % (section, section, section,building,)
                 

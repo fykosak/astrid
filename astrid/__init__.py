@@ -14,7 +14,10 @@ class BuildLogger:
         
     def _getLogfile(self, reponame):
         return os.path.expanduser('~/.astrid/{}.log'.format(reponame))
-        
+
+    def _getBuildlogfile(self, reponame):
+        return os.path.expanduser('~/.astrid/{}.build.log'.format(reponame))
+         
     def log(self, reponame, message, sendMail = False):
         logfile = self._getLogfile(reponame)
         f = open(logfile, "a")
@@ -35,6 +38,16 @@ class BuildLogger:
             return records
         except:
             return []
+
+    def getBuildlog(self, reponame):
+        fn = self._getBuildlogfile(reponame)
+        try:
+            f = open(fn, "r")
+            res = f.read()
+            f.close()
+            return res
+        except:
+            return None
 
     def _sendMail(self, reponame, message):
         headerFrom = cherrypy.config.get("mail_from")
@@ -64,10 +77,13 @@ cherrypy.config.update(config)
 # prepare locks for each repository
 locks = {section: threading.Lock() for section in repos.sections()}
 
-from astrid.pages import BuilderPage, InfoPage, DashboardPage
+from astrid.pages import BuilderPage, InfoPage, DashboardPage, BuildlogPage
 
-root = DashboardPage(repos, locks)
-root.build = BuilderPage(cherrypy.config.get("repodir"), repos, locks)
-root.info = InfoPage(cherrypy.config.get("repodir"), repos, locks)
+repodir = cherrypy.config.get("repodir")
+
+root = DashboardPage(repodir, repos, locks)
+root.build = BuilderPage(repodir, repos, locks)
+root.info = InfoPage(repodir, repos, locks)
+root.buildlog = BuildlogPage(repodir, repos, locks)
 
        
