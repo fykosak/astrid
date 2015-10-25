@@ -1,5 +1,11 @@
 {include header.inc}
 <body>
 <h2>Information for repository {reponame}</h2>
+<p>
+<strong>Address:</strong> {!repo.path}<br/>
+<strong>Permitted users:</strong> {!repo.users}<br/>
+<strong>Build user:</strong> {!repo.build_usr}<br/>
+<strong>Build command:</strong> {!repo.build_cmd} {!repo.build_args}
+</p>
 {messages}
 {include footer.inc}

@@ -150,6 +150,9 @@ class InfoPage(BasePage):
         
         template = Template("templates/info.html")
         template.assignData("reponame", reponame)
+        for k, v in self.repos.items(reponame):
+            template.assignData("repo." + k, v)
+
         template.assignData("messages", msg)        
         template.assignData("pagetitle", reponame + " info")
         
