@@ -1,8 +1,9 @@
 About
 =====
-Astrid is minimalistic content integration server. It tracks Git repositories
-can run build tasks on them and expose the built repositories on the web. It's
-important that Astrid separate to isolate its users' access rights.
+Astrid is a minimalistic content integration server. It tracks Git
+repositories, it can run build tasks on them and expose the built repositories
+on the web. Astrid provides simple isolation of different build users with the
+help of file permissions.
 
 Installation
 ============
@@ -11,7 +12,8 @@ Quickest way is to install Astrid from Python egg (run `./build.sh` to build
 the egg) on the destination machine.
 
 After egg installation, copy configuration files located in 'config' directory
-into '~/.astrid' and strip the '.sample' extension.
+into '~/.astrid' and strip the '.sample' extension. (It is recommended to
+create separate user account for astrid daemon.)
 
 Eventually edit the settings for your site.
 
@@ -20,4 +22,4 @@ Run
 Start Astrid with script 'bin/astrid', it will spawn a background process.
 
 Configure post-receive hook in your Git repository to let Astrid know about
-incoming updates. Sample hook is in 'bin/touch-astrid'.
+incoming updates. Sample hook is in 'bin/touch-astrid.sh'.
