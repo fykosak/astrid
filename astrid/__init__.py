@@ -68,10 +68,14 @@ class BuildLogger:
 
 from ConfigParser import ConfigParser
 
-repos = ConfigParser()
-repos.read(os.path.expanduser('~/.astrid/repos.ini'))
+REPOS_INI = '~/.astrid/repos.ini'
+CONFIG_INI = '~/.astrid/config.ini'
 
-config = os.path.expanduser('~/.astrid/config.ini')
+repos = ConfigParser()
+repos.read(os.path.expanduser(REPOS_INI))
+cherrypy.engine.autoreload.files.add(REPOS_INI)
+
+config = os.path.expanduser(CONFIG_INI)
 cherrypy.config.update(config)
 
 # prepare locks for each repository
