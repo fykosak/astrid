@@ -15,6 +15,12 @@ After egg installation, copy configuration files located in 'config' directory
 into '~/.astrid' and strip the '.sample' extension. (It is recommended to
 create separate user account for astrid daemon.)
 
+If you want to integrate Astrid with systemd, copy 'astrid.service' file into
+/etc/systemd/system/astrid.service on target machine and run 'systemctl
+daemon-reload && systemctl enable astrid.service'.
+(NOTE: It assumes existence of user 'astrid' and hardcoded path to its home
+directory.)
+
 Eventually edit the settings for your site.
 
 Manual running
@@ -22,6 +28,13 @@ Manual running
 
 Start Astrid with script 'bin/astrid -d [pidfile]', it will spawn a background
 process and write its PID into the pidfile.
+
+Running as systemd service
+==========================
+
+If you installed service unit file as described in Installation, you can
+control Astrid via systemctl commands.
+
 
 Automatic rebuilds
 ==================
