@@ -20,8 +20,9 @@ Authorization: Basic $AUTH\r
 \r
 "
 
-        echo -ne "$REQUEST" | /bin/nc.traditional -q 1 ${HOST/:/ }
-        echo "$GL_REPO: rebuild request sent to Astrid."
+        echo -ne "$REQUEST" | /bin/nc.traditional -q 1 ${HOST/:/ } \
+	  && echo "$GL_REPO: rebuild request sent to Astrid." \
+	  || echo "$GL_REPO: rebuild request sending failed."
 }
 
 touch_astrid
