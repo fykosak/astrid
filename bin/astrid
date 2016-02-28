@@ -8,15 +8,23 @@ import os
 from cherrypy.process.plugins import Daemonizer
 from cherrypy.process.plugins import PIDFile
 
-if len(sys.argv) < 2:
+daemon = False
+argc = len(sys.argv)
+
+if argc == 1:
+    daemon = False
+elif argc == 2 and sys.argv[1] == '-d':
     pidfile = os.path.expanduser("~/.astrid/pidfile")
+    daemon = True
+elif argc == 3 and sys.argv[1] == '-d':
+    pidfile = sys.argv[2]
 else:
-    pidfile = sys.argv[1]
+    print("Usage: %s [-d [pidfile]]" % sys.argv[0])
+    sys.exit(1)
 
-print("Using pidfile %s" % pidfile)
-
-Daemonizer(cherrypy.engine).subscribe()
-PIDFile(cherrypy.engine, pidfile=pidfile).subscribe()
+if daemon:
+    Daemonizer(cherrypy.engine).subscribe()
+    PIDFile(cherrypy.engine, pidfile=pidfile).subscribe()
 
 cherrypy.tree.mount(astrid.root, "/", config=astrid.config)
 cherrypy.engine.start()
