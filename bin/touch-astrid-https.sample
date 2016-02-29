@@ -9,7 +9,7 @@ URL="/build/reponame"
 
 function touch_astrid {
     # timeout 1 second, 1 try
-    wget -T 1 -t 1 --http-user=$USER --http-password=$PASS -O /dev/null https://${HOST}$URL 2>/dev/null & 
+    wget -T 1 -t 1 --http-user=$USER --http-password=$PASS -O /dev/null https://${HOST}$URL 2>/dev/null
     if [ $? = 0 ] ; then
         echo "$URL: rebuild request sent to Astrid."
     else
@@ -18,4 +18,4 @@ function touch_astrid {
 }
 
 
-touch_astrid
+touch_astrid &
