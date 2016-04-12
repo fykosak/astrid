@@ -198,6 +198,11 @@ class DashboardPage(BasePage):
     _cp_config = {'tools.staticdir.on' : True,
                   'tools.staticdir.dir' : cherrypy.config.get("repodir"),
                   'tools.staticdir.indexlister': astrid.server.htmldir,
+                  'tools.staticdir.content_types': {
+                      'aux': 'text/plain',
+                      'log': 'text/plain',
+                      'out': 'text/plain'
+                   }
 #                  'tools.staticdir.index' : 'index.html',
     }
     
