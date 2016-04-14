@@ -201,7 +201,20 @@ class DashboardPage(BasePage):
                   'tools.staticdir.content_types': {
                       'aux': 'text/plain',
                       'log': 'text/plain',
-                      'out': 'text/plain'
+                      'toc': 'text/plain',
+                      'out': 'text/plain',
+                      'mpx': 'text/plain'
+                      #'plt:  ??? or download like .tex
+                      #'mp':  ??? or download like .tex
+                      #'dat': ??? or download like .tex
+                      #'inc': ??? or download like .tex
+                      #'tex': ??? or download like .tex
+                      #'py':  ??? or download like .tex
+                      #'sh':  ??? or download like .tex
+                      #'csv': ??? or download like .tex
+                      #'sample': ??? how about this stuff?
+                      #'ipe': ??? how about this stuff?
+                      #'Makefile': ??? how about Makefiles
                    }
 #                  'tools.staticdir.index' : 'index.html',
     }
