@@ -199,21 +199,22 @@ class DashboardPage(BasePage):
                   'tools.staticdir.dir' : cherrypy.config.get("repodir"),
                   'tools.staticdir.indexlister': astrid.server.htmldir,
                   'tools.staticdir.content_types': {
-                      'aux': 'text/plain',
-                      'log': 'text/plain',
-                      'toc': 'text/plain',
-                      'out': 'text/plain',
-                      'mpx': 'text/plain'
-                      #'plt:  ??? or download like .tex
-                      #'mp':  ??? or download like .tex
-                      #'dat': ??? or download like .tex
+                      'aux': 'text/plain; charset=utf-8',
+                      'log': 'text/plain; charset=utf-8',
+                      'toc': 'text/plain; charset=utf-8',
+                      'out': 'text/plain; charset=utf-8',
+                      'tex': 'text/plain; charset=utf-8',
+                      'mpx': 'text/plain; charset=utf-8',
+                      'mp': 'text/plain; charset=utf-8',
+                      'plt': 'text/plain; charset=utf-8',
+                      'dat': 'text/plain; charset=utf-8',
+                      'csv': 'text/csv; charset=utf-8',
+                      'py': 'text/x-python; charset=utf-8',
+                      'sh': 'text/x-sh; charset=utf-8',
+                      'soap': 'application/soap+xml',
+                      'ipe': 'application/xml'
                       #'inc': ??? or download like .tex
-                      #'tex': ??? or download like .tex
-                      #'py':  ??? or download like .tex
-                      #'sh':  ??? or download like .tex
-                      #'csv': ??? or download like .tex
                       #'sample': ??? how about this stuff?
-                      #'ipe': ??? how about this stuff?
                       #'Makefile': ??? how about Makefiles
                    }
 #                  'tools.staticdir.index' : 'index.html',
