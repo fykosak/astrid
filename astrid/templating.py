@@ -1,5 +1,5 @@
 import os
-import cgi
+import html
 import re
 import os.path
 import pkg_resources
@@ -15,7 +15,7 @@ class Template:
         
     def render(self):
         # firstly include files        
-        template = pkg_resources.resource_stream('astrid', self.filename).read()
+        template = pkg_resources.resource_stream('astrid', self.filename).read().decode()
         template = re.sub('\{include ([^\}]*)\}', self._include, template)
         # secondly expand variables
         return re.sub('\{(!)?([^\}]*)\}', self._expand, template)
@@ -27,7 +27,7 @@ class Template:
             if not f:
                 self.includes[filename] = "NOT FOUND"
             else:
-                self.includes[filename] = f.read()
+                self.includes[filename] = f.read().decode()
                 f.close()
         
         return self.includes[filename]
@@ -38,7 +38,7 @@ class Template:
         else:
             data = "undefined"     
         if mo.group(1) == "!":
-            return cgi.escape(data)
+            return html.escape(data)
         else:
             return data
             

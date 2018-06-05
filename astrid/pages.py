@@ -8,7 +8,7 @@ import sys
 import time
 
 from git import Repo, Git, GitCommandError
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 from astrid import BuildLogger
 from astrid.templating import Template
@@ -53,18 +53,18 @@ class BuilderPage(BasePage):
                 repo = self._updateRepo(reponame)
                 try:
                     if self._build(reponame):
-                        msg = """#%s Build succeeded.""" % repo.head.commit.hexsha[0:6]
+                        msg = "#{} Build succeeded.".format(repo.head.commit.hexsha[0:6])
                         msg_class = "green"
                         time_end = time.time()
                     else:
-                        msg = """#%s Build failed.""" % repo.head.commit.hexsha[0:6]
+                        msg = "#{} Build failed.".format(repo.head.commit.hexsha[0:6])
                         msg_class = "red"
                 except:
-                    msg = """#%s Build error.""" % repo.head.commit.hexsha[0:6]
+                    msg = "#{} Build error.".format(repo.head.commit.hexsha[0:6])
                     msg_class = "red"
                     raise
             except GitCommandError as e:
-                msg = "Pull error. (" + str(e) + ")"
+                msg = "Pull error. ({})".format(str(e))
                 msg_class = "red"
                 sendMail = True
                 raise
@@ -132,7 +132,7 @@ class BuilderPage(BasePage):
         args = self.repos.get(reponame, "build_args")
         cwd = os.path.join(self.repodir, reponame)
         
-        logfilename = os.path.expanduser("~/.astrid/%s.build.log" % reponame)
+        logfilename = os.path.expanduser("~/.astrid/{}.build.log".format(reponame))
         logfile = open(logfilename, "w")
         p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile, stdin=open("/dev/null"))
         p.wait()        
@@ -154,10 +154,10 @@ class InfoPage(BasePage):
         for record in logger.getLogs(reponame):
             record += ['']*(3-len(record))
             if first:
-                msg += """<tr><td>%s</td><td><a href="../buildlog/%s">%s</a></td><td>%s</td></tr>""" % (record[0], reponame, record[1],record[2],)
+                msg += """<tr><td>{}</td><td><a href="../buildlog/{}">{}</a></td><td>{}</td></tr>""".format(record[0], reponame, record[1], record[2])
                 first = False
             else:
-                msg += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % (record[0], record[1],record[2],)
+                msg += """<tr><td>{}</td><td>{}</td><td>{}</td></tr>""".format(record[0], record[1], record[2])
             
         msg += "</table>"
         
@@ -216,7 +216,7 @@ class DashboardPage(BasePage):
             if user in self.repos.get(section, "users").split(","):
                 building = self._isBuilding(section)
                 building = ', building&hellip;' if building else ''
-                repos += """<li><a href="%s">%s</a> (<a href="info/%s">info</a>%s)</li>""" % (section, section, section,building,)
+                repos += """<li><a href="{}">{}</a> (<a href="info/{}">info</a>{})</li>""".format(section, section, section, building)
                 
         template.assignData("pagetitle", "Astrid")
         template.assignData("repos", repos)

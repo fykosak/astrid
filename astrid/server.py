@@ -3,12 +3,12 @@ import os.path
 import cherrypy.lib.auth_basic
 import re
 import stat
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import datetime
-from cherrypy.lib import cptools, http
+from cherrypy.lib import cptools, httputil
 from cherrypy.lib.static import staticdir
 
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 import astrid
 
@@ -22,18 +22,18 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
     if hdr:
         fh += """<html>
 <head>
-<title>Directory listing for: %s</title>
+<title>Directory listing for: {}</title>
 <style type="text/css">@import url("/dirstyle.css");</style>
 </head>
 <body>
-""" % url
+""".format(url)
 
     path = path.rstrip(r"\/")
     fh += '<h3>Directory listing for: <a href="' + url + '">' + url + \
              '</a></h3><hr>\n'
     fh += '<table><tr><th>File</th><th>Size</th><th>Last mod</th></tr>'
     
-    fh += """<tr><td><a href="%s">%s/</a></td><td>%s</td><td>%s</td></tr>""" % ( "..",  "..", "", "",)
+    fh += """<tr><td><a href="{}">{}/</a></td><td>{}</td><td>{}</td></tr>""".format("..", "..", "", "")
     for dpath, ddirs, dfiles in os.walk( path ):
 
         for dn in sorted( ddirs ):
@@ -42,7 +42,7 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
             fdn = os.path.join( dpath, dn )
             dmtime = os.path.getmtime( fdn )
             dtim = datetime.datetime.fromtimestamp( dmtime ).isoformat(' ')
-            fh += """<tr><td><a href="%s">%s/</a></td><td>%s</td><td>%s</td></tr>""" % ( dn + '/',  dn, "", dtim,)
+            fh += """<tr><td><a href="{}">{}/</a></td><td>{}</td><td>{}</td></tr>""".format(dn + '/', dn, "", dtim)
 
         del ddirs[:] # limit to one level
 
@@ -53,7 +53,7 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
             siz = os.path.getsize( fn )
             fmtime = os.path.getmtime( fn )
             ftim = datetime.datetime.fromtimestamp( fmtime ).isoformat(' ')
-            fh += """<tr><td><a href="%s">%s</a></td><td>%s</td><td>%s</td></tr>""" % ( fil, fil, str(siz), ftim, )
+            fh += """<tr><td><a href="{}">{}</a></td><td>{}</td><td>{}</td></tr>""".format(fil, fil, siz, ftim)
 
     fh += '</table>'
     # postamble
@@ -130,7 +130,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
         section = "/"
     section = section.rstrip(r"\/")
     branch = cherrypy.request.path_info[len(section) + 1:]
-    branch = urllib.unquote(branch.lstrip(r"\/"))
+    branch = urllib.parse.unquote(branch.lstrip(r"\/"))
     
     # If branch is "", filename will end in a slash
     filename = os.path.join(dir, branch)
@@ -154,7 +154,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     # variety of paths). If using tools.static, you can make your relative
     # paths become absolute by supplying a value for "tools.static.root".
     if not os.path.isabs(path):
-        raise ValueError("'%s' is not an absolute path." % path)
+        raise ValueError("'{}' is not an absolute path.".format(path))
     
     try:
         st = os.stat(path)
@@ -167,10 +167,10 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
 
         # Set the Last-Modified response header, so that
         # modified-since validation code can work.
-        response.headers['Last-Modified'] = http.HTTPDate(st.st_mtime)
+        response.headers['Last-Modified'] = httputil.HTTPDate(st.st_mtime)
         cptools.validate_since()
         response.body = indexlister( section=section, dir=dir, path=path,
-                                     **kwargs )
+                                     **kwargs ).encode()
         response.headers['Content-Type'] = 'text/html'
         req.is_index = True
         return True

@@ -54,7 +54,7 @@ class BuildLogger:
         headerTo = cherrypy.config.get("mail_to")
 
         msg = MIMEText(message)
-        msg['Subject'] = 'Astrid coughed on repo %s' % reponame
+        msg['Subject'] = 'Astrid coughed on repo {}'.format(reponame)
         msg['From'] = headerFrom
         msg['To'] = headerTo
 
@@ -66,7 +66,7 @@ class BuildLogger:
             pass
 
 
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 REPOS_INI = '~/.astrid/repos.ini'
 CONFIG_INI = '~/.astrid/config.ini'
