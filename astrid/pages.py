@@ -121,7 +121,7 @@ class BuilderPage(BasePage):
 
         # now set correct group (same as build user)
         usr = self.repos.get(reponame, "build_usr")
-        p = subprocess.Popen(["chgrp", usr, "-R", localpath])
+        p = subprocess.Popen(["chgrp", usr, "-R", "-f", localpath])
         p.wait()        
 
         return repo
