@@ -8,6 +8,8 @@ import os
 from cherrypy.process.plugins import Daemonizer
 from cherrypy.process.plugins import PIDFile
 
+print("Starting Astrid service")
+
 daemon = False
 argc = len(sys.argv)
 
@@ -25,6 +27,8 @@ else:
 if daemon:
     Daemonizer(cherrypy.engine).subscribe()
     PIDFile(cherrypy.engine, pidfile=pidfile).subscribe()
+
+print("Starting web server")
 
 cherrypy.tree.mount(astrid.root, "/", config=astrid.config)
 cherrypy.engine.start()

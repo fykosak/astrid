@@ -19,7 +19,7 @@ class BasePage(object):
         self.repos = repos
         self.repodir = repodir
         self.locks = locks
-    
+
     def _checkAccess(self, reponame):
         user = cherrypy.request.login
         if user not in self.repos.get(reponame, "users"):
@@ -31,22 +31,22 @@ class BasePage(object):
         if not building: # repo's not building, we release the lock
             lock.release()
         return building
-        
+
 
 class BuilderPage(BasePage):
-    
+
     @cherrypy.expose
     def default(self, reponame):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
-        
+
         self._checkAccess(reponame)
         lock = self.locks[reponame]
         msg = None
         sendMail = False
-        
+
         lock.acquire()
-        try:            
+        try:
             try:
                 time_start = time.time()
                 time_end = None
@@ -68,11 +68,11 @@ class BuilderPage(BasePage):
                 msg_class = "red"
                 sendMail = True
                 raise
-            
+
             if time_end != None:
                 msg += " ({:.2f} s)".format(time_end - time_start)
 
-            
+
             template = Template("templates/build.html")
             template.assignData("reponame", reponame)
             template.assignData("message", msg)
@@ -82,15 +82,17 @@ class BuilderPage(BasePage):
         finally:
             logger = BuildLogger(self.repodir)
             logger.log(reponame, msg, sendMail)
-            lock.release()            
-    
+            lock.release()
+
     def _updateRepo(self, reponame):
+        print(f"Updating repository {reponame}")
         remotepath = self.repos.get(reponame, "path")
         submodules = self.repos.get(reponame, "submodules") if self.repos.has_option(reponame, "submodules") else False
         localpath = os.path.join(self.repodir, reponame)
 
         os.umask(0o007) # create repo content not readable to others
         if not os.path.isdir(localpath):
+            print(f"Repository {reponame} empty, creating")
             g = Git()
             g.clone(remotepath, localpath)
 
@@ -101,8 +103,9 @@ class BuilderPage(BasePage):
 
             # not-working umask workaround
             p = subprocess.Popen(["chmod", "g+w", localpath])
-            p.wait()        
+            p.wait()
         else:
+            print(f"Pulling repository {reponame}")
             repo = Repo(localpath)
             try:
                 repo.git.update_index("--refresh")
@@ -122,33 +125,33 @@ class BuilderPage(BasePage):
         # now set correct group (same as build user)
         usr = self.repos.get(reponame, "build_usr")
         p = subprocess.Popen(["chgrp", usr, "-R", "-f", localpath])
-        p.wait()        
+        p.wait()
 
         return repo
-        
+
     def _build(self, reponame):
         usr = self.repos.get(reponame, "build_usr")
         cmd = self.repos.get(reponame, "build_cmd")
         args = self.repos.get(reponame, "build_args")
         cwd = os.path.join(self.repodir, reponame)
-        
+
         logfilename = os.path.expanduser("~/.astrid/{}.build.log".format(reponame))
         logfile = open(logfilename, "w")
-        p = subprocess.Popen(["sudo", "-u", usr, cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile, stdin=open("/dev/null"))
-        p.wait()        
+        p = subprocess.Popen([cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile, stdin=open("/dev/null"))
+        p.wait()
         return p.returncode == 0
-        
+
 class InfoPage(BasePage):
 
     @cherrypy.expose
     def default(self, reponame):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
-        
+
         self._checkAccess(reponame)
-        
+
         logger = BuildLogger(self.repodir)
-        
+
         msg = "<table><tr><th>Time</th><th>Message</th><th>User</th></tr>"
         first = True
         for record in logger.getLogs(reponame):
@@ -158,9 +161,9 @@ class InfoPage(BasePage):
                 first = False
             else:
                 msg += """<tr><td>{}</td><td>{}</td><td>{}</td></tr>""".format(record[0], record[1], record[2])
-            
+
         msg += "</table>"
-        
+
         template = Template("templates/info.html")
         template.assignData("reponame", reponame)
         for k, v in self.repos.items(reponame):
@@ -168,7 +171,7 @@ class InfoPage(BasePage):
 
         template.assignData("messages", msg)        
         template.assignData("pagetitle", reponame + " info")
-        
+
         return template.render()
 
 class BuildlogPage(BasePage):
@@ -177,9 +180,9 @@ class BuildlogPage(BasePage):
     def default(self, reponame):
         if reponame not in self.repos.sections():
             raise cherrypy.HTTPError(404)
-        
+
         self._checkAccess(reponame)
-        
+
         logger = BuildLogger(self.repodir)
         building = self._isBuilding(reponame)
         building = ', building&hellip;' if building else ''
@@ -190,7 +193,7 @@ class BuildlogPage(BasePage):
         template.assignData("buildlog", logger.getBuildlog(reponame))
 
         template.assignData("pagetitle", reponame + " build log")
-        
+
         return template.render()
 
 
@@ -219,7 +222,7 @@ class DashboardPage(BasePage):
                    }
 #                  'tools.staticdir.index' : 'index.html',
     }
-    
+
     @cherrypy.expose
     def index(self, **params):
         template = Template('templates/home.html')
@@ -231,18 +234,10 @@ class DashboardPage(BasePage):
                 building = self._isBuilding(section)
                 building = ', building&hellip;' if building else ''
                 repos += """<li><a href="{}">{}</a> (<a href="info/{}">info</a>{})</li>""".format(section, section, section, building)
-                
+
         template.assignData("pagetitle", "Astrid")
         template.assignData("repos", repos)
         template.assignData("user", user)
         return template.render()
-        
 
     index._cp_config = {'tools.staticdir.on': False}
-
-
-
-
-
-
-

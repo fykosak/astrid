@@ -8,31 +8,31 @@ import threading
 
 class BuildLogger:
     separator = ";"
-    
+
     def __init__(self, repodir):
         self.repodir = repodir
-        
+
     def _getLogfile(self, reponame):
         return os.path.expanduser('~/.astrid/{}.log'.format(reponame))
 
     def _getBuildlogfile(self, reponame):
         return os.path.expanduser('~/.astrid/{}.build.log'.format(reponame))
-         
+
     def log(self, reponame, message, sendMail = False):
         logfile = self._getLogfile(reponame)
         f = open(logfile, "a")
         user = cherrypy.request.login
         f.write(BuildLogger.separator.join([datetime.now().isoformat(' '), message, user]) + "\n")
         f.close()
-    
+
         if sendMail:
             self._sendMail(reponame, message)
-    
+
     def getLogs(self, reponame):
         logfile = self._getLogfile(reponame)
         try:
             f = open(logfile, "r")
-                
+
             records = [row.split(BuildLogger.separator) for row in reversed(list(f))]
             f.close()
             return records
@@ -89,5 +89,3 @@ root = DashboardPage(repodir, repos, locks)
 root.build = BuilderPage(repodir, repos, locks)
 root.info = InfoPage(repodir, repos, locks)
 root.buildlog = BuildlogPage(repodir, repos, locks)
-
-       
