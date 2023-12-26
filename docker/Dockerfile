@@ -1,7 +1,7 @@
 FROM python:3.12
 
 # install docker
-RUN apt update && apt install -y podman
+RUN apt update && apt install -y podman containers-storage
 
 # add astrid user
 ARG DOCKER_USER=astrid

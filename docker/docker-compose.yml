@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  astrid:
+    image: astrid
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: on-failure:3
+    container_name: astrid
+    environment:
+      TZ: 'Europe/Prague'
+    privileged: true # needed for containers
+    volumes:
+      - ./config:/home/astrid/.astrid
+      - ./ssh:/home/astrid/.ssh
+      - ./containers:/home/astrid/.local/share/containers
+      - ./repos:/data/repos
+    ports:
+      - 8080:8080 # opened port mapping, not needed with proxy
+    user: 1000:1000 # expects the main user with uid:pid

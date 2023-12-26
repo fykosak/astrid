@@ -122,6 +122,7 @@ class BuilderPage(BasePage):
                 repo.git.submodule("foreach", "git", "fetch")
                 repo.git.submodule("update")
 
+        print(f"Building {reponame}")
         # now set correct group (same as build user)
         usr = self.repos.get(reponame, "build_usr")
         p = subprocess.Popen(["chgrp", usr, "-R", "-f", localpath])
@@ -130,15 +131,13 @@ class BuilderPage(BasePage):
         return repo
 
     def _build(self, reponame):
-        usr = self.repos.get(reponame, "build_usr")
         cmd = self.repos.get(reponame, "build_cmd")
-        args = self.repos.get(reponame, "build_args")
-        cwd = os.path.join(self.repodir, reponame)
+        cwd = os.path.join(self.repodir, reponame) # current working directory
+        image_version = self.repos.get(reponame, "image_version")
 
         logfilename = os.path.expanduser("~/.astrid/{}.build.log".format(reponame))
         logfile = open(logfilename, "w")
-        p = subprocess.Popen([cmd] + shlex.split(args), cwd=cwd, stdout=logfile, stderr=logfile, stdin=open("/dev/null"))
-        p.wait()
+        p = subprocess.run(["podman", "run", "--rm", "-v", f"{cwd}:/usr/src/local", f"fykosak/buildtools:{image_version}"] + cmd.split(), cwd=cwd, stdout=logfile, stderr=logfile, check=False)
         return p.returncode == 0
 
 class InfoPage(BasePage):
