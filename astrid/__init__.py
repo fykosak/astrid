@@ -68,8 +68,8 @@ class BuildLogger:
 
 from configparser import ConfigParser
 
-REPOS_INI = '~/.astrid/repos.ini'
-CONFIG_INI = '~/.astrid/config.ini'
+REPOS_INI = '/app/config/repos.ini'
+CONFIG_INI = '/app/config/config.ini'
 
 repos = ConfigParser()
 repos.read(os.path.expanduser(REPOS_INI))

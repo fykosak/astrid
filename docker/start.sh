@@ -1,1 +1,0 @@
-docker run --rm --name astrid --volume "./config:/home/astrid/.astrid" --volume "./ssh:/home/astrid/.ssh" --volume "./containers:/home/astrid/.local/share/containers" --volume "./repos:/data/repos" -p 8080:8080 --privileged astrid

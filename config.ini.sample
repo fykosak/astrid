@@ -7,7 +7,7 @@ tools.auth_basic.on: True
 tools.auth_basic.realm: 'Astrid authorization'
 tools.auth_basic.checkpassword: cherrypy.lib.auth_basic.checkpassword_dict({'user': 'passwd'})
 tools.expires.sec = 0
-repodir = 'data'
+repodir = '/app/repos'
 
 [/style.css]
 tools.staticfile.on = True
