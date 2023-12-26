@@ -14,11 +14,11 @@ class Template:
         self.data[name] = str(data)
 
     def render(self):
-        # firstly include files        
+        # firstly include files
         template = pkg_resources.resource_stream('astrid', self.filename).read().decode()
-        template = re.sub('\{include ([^\}]*)\}', self._include, template)
+        template = re.sub('{include ([^}]*)}', self._include, template)
         # secondly expand variables
-        return re.sub('\{(!)?([^\}]*)\}', self._expand, template)
+        return re.sub('{(!)?([^}]*)}', self._expand, template)
 
     def _include(self, mo):
         filename = os.path.dirname(self.filename) + "/" + mo.group(1)
@@ -39,5 +39,4 @@ class Template:
             data = "undefined"
         if mo.group(1) == "!":
             return html.escape(data)
-        else:
-            return data
+        return data

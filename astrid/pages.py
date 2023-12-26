@@ -1,14 +1,10 @@
-import cherrypy
 import os.path
 import os
 import subprocess
-import shlex
-import threading
-import sys
 import time
+import cherrypy
 
 from git import Repo, Git, GitCommandError
-from configparser import ConfigParser
 
 from astrid import BuildLogger
 from astrid.templating import Template
@@ -53,25 +49,25 @@ class BuilderPage(BasePage):
                 repo = self._updateRepo(reponame)
                 try:
                     if self._build(reponame):
-                        msg = "#{} Build succeeded.".format(repo.head.commit.hexsha[0:6])
+                        msg = f"#{repo.head.commit.hexsha[0:6]} Build succeeded."
                         msg_class = "green"
                         time_end = time.time()
                     else:
-                        msg = "#{} Build failed.".format(repo.head.commit.hexsha[0:6])
+                        msg = f"#{repo.head.commit.hexsha[0:6]} Build failed."
                         msg_class = "red"
+                        time_end = time.time()
                 except:
-                    msg = "#{} Build error.".format(repo.head.commit.hexsha[0:6])
+                    msg = f"#{repo.head.commit.hexsha[0:6]} Build error."
                     msg_class = "red"
                     raise
             except GitCommandError as e:
-                msg = "Pull error. ({})".format(str(e))
+                msg = f"Pull error. ({e})"
                 msg_class = "red"
                 sendMail = True
                 raise
 
-            if time_end != None:
+            if time_end is not None:
                 msg += " ({:.2f} s)".format(time_end - time_start)
-
 
             template = Template("templates/build.html")
             template.assignData("reponame", reponame)
@@ -102,8 +98,7 @@ class BuilderPage(BasePage):
                 repo.git.submodule("init")
 
             # not-working umask workaround
-            p = subprocess.Popen(["chmod", "g+w", localpath])
-            p.wait()
+            subprocess.run(["chmod", "g+w", localpath], check=False)
         else:
             print(f"Pulling repository {reponame}")
             repo = Repo(localpath)
@@ -122,12 +117,6 @@ class BuilderPage(BasePage):
                 repo.git.submodule("foreach", "git", "fetch")
                 repo.git.submodule("update")
 
-        print(f"Building {reponame}")
-        # now set correct group (same as build user)
-        usr = self.repos.get(reponame, "build_usr")
-        p = subprocess.Popen(["chgrp", usr, "-R", "-f", localpath])
-        p.wait()
-
         return repo
 
     def _build(self, reponame):
@@ -135,7 +124,8 @@ class BuilderPage(BasePage):
         cwd = os.path.join(self.repodir, reponame) # current working directory
         image_version = self.repos.get(reponame, "image_version")
 
-        logfilename = os.path.expanduser("~/.astrid/{}.build.log".format(reponame))
+        print(f"Building {reponame}")
+        logfilename = os.path.expanduser(f"~/.astrid/{reponame}.build.log")
         logfile = open(logfilename, "w")
         p = subprocess.run(["podman", "run", "--rm", "-v", f"{cwd}:/usr/src/local", f"fykosak/buildtools:{image_version}"] + cmd.split(), cwd=cwd, stdout=logfile, stderr=logfile, check=False)
         return p.returncode == 0
@@ -156,10 +146,10 @@ class InfoPage(BasePage):
         for record in logger.getLogs(reponame):
             record += ['']*(3-len(record))
             if first:
-                msg += """<tr><td>{}</td><td><a href="../buildlog/{}">{}</a></td><td>{}</td></tr>""".format(record[0], reponame, record[1], record[2])
+                msg += f'<tr><td>{record[0]}</td><td><a href="../buildlog/{reponame}">{record[1]}</a></td><td>{record[2]}</td></tr>'
                 first = False
             else:
-                msg += """<tr><td>{}</td><td>{}</td><td>{}</td></tr>""".format(record[0], record[1], record[2])
+                msg += f"<tr><td>{record[0]}</td><td>{record[1]}</td><td>{record[2]}</td></tr>"
 
         msg += "</table>"
 
@@ -168,7 +158,7 @@ class InfoPage(BasePage):
         for k, v in self.repos.items(reponame):
             template.assignData("repo." + k, v)
 
-        template.assignData("messages", msg)        
+        template.assignData("messages", msg)
         template.assignData("pagetitle", reponame + " info")
 
         return template.render()
@@ -185,7 +175,7 @@ class BuildlogPage(BasePage):
         logger = BuildLogger(self.repodir)
         building = self._isBuilding(reponame)
         building = ', building&hellip;' if building else ''
- 
+
         template = Template("templates/buildlog.html")
         template.assignData("reponame", reponame)
         template.assignData("building", building)
@@ -219,7 +209,7 @@ class DashboardPage(BasePage):
                       #'sample': ??? how about this stuff?
                       #'Makefile': ??? how about Makefiles
                    }
-#                  'tools.staticdir.index' : 'index.html',
+                   #'tools.staticdir.index' : 'index.html',
     }
 
     @cherrypy.expose
@@ -228,11 +218,11 @@ class DashboardPage(BasePage):
         repos = ""
         user = cherrypy.request.login
 
-        for section in self.repos.sections():            
+        for section in self.repos.sections():
             if user in self.repos.get(section, "users").split(","):
                 building = self._isBuilding(section)
                 building = ', building&hellip;' if building else ''
-                repos += """<li><a href="{}">{}</a> (<a href="info/{}">info</a>{})</li>""".format(section, section, section, building)
+                repos += f'<li><a href="{section}">{section}</a> (<a href="info/{section}">info</a>{building})</li>'
 
         template.assignData("pagetitle", "Astrid")
         template.assignData("repos", repos)

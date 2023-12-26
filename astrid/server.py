@@ -1,17 +1,14 @@
-import cherrypy
 import os.path
-import cherrypy.lib.auth_basic
 import re
 import stat
 import urllib.request, urllib.parse, urllib.error
 import datetime
+import cherrypy
+import cherrypy.lib.auth_basic
 from cherrypy.lib import cptools, httputil
 from cherrypy.lib.static import staticdir
 
-from configparser import ConfigParser
-
 import astrid
-
 
 def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
     fh = ''
@@ -33,7 +30,7 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
              '</a></h3><hr>\n'
     fh += '<table><tr><th>File</th><th>Size</th><th>Last mod</th></tr>'
 
-    fh += """<tr><td><a href="{}">{}/</a></td><td>{}</td><td>{}</td></tr>""".format("..", "..", "", "")
+    fh += '<tr><td><a href="..">../</a></td><td></td><td></td></tr>'
     for dpath, ddirs, dfiles in os.walk( path ):
 
         for dn in sorted( ddirs ):
@@ -42,7 +39,7 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
             fdn = os.path.join( dpath, dn )
             dmtime = os.path.getmtime( fdn )
             dtim = datetime.datetime.fromtimestamp( dmtime ).isoformat(' ')
-            fh += """<tr><td><a href="{}">{}/</a></td><td>{}</td><td>{}</td></tr>""".format(dn + '/', dn, "", dtim)
+            fh += f'<tr><td><a href="{dn}/">{dn}/</a></td><td></td><td>{dtim}</td></tr>'
 
         del ddirs[:] # limit to one level
 
@@ -53,7 +50,7 @@ def htmldir( section="", dir="", path="", hdr=True, **kwargs ):
             siz = os.path.getsize( fn )
             fmtime = os.path.getmtime( fn )
             ftim = datetime.datetime.fromtimestamp( fmtime ).isoformat(' ')
-            fh += """<tr><td><a href="{}">{}</a></td><td>{}</td><td>{}</td></tr>""".format(fil, fil, siz, ftim)
+            fh += f'<tr><td><a href="{fil}">{fil}</a></td><td>{siz}</td><td>{ftim}</td></tr>'
 
     fh += '</table>'
     # postamble
@@ -92,7 +89,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     reponame = req.path_info.split("/")[1]
     if reponame not in ["info", "build", "buildlog"]:
         if reponame not in astrid.repos.sections():
-                raise cherrypy.HTTPError(404)
+            raise cherrypy.HTTPError(404)
 
         if user not in astrid.repos.get(reponame, "users"):
             raise cherrypy.HTTPError(401)
@@ -154,7 +151,7 @@ def staticdirindex(section, dir, root="", match="", content_types=None, index=""
     # variety of paths). If using tools.static, you can make your relative
     # paths become absolute by supplying a value for "tools.static.root".
     if not os.path.isabs(path):
-        raise ValueError("'{}' is not an absolute path.".format(path))
+        raise ValueError(f"'{path}' is not an absolute path.")
 
     try:
         st = os.stat(path)
