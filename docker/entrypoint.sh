@@ -9,16 +9,16 @@ if [ -z "$PUID" ]; then
 fi
 
 if [ -z "$GUID" ]; then
-	echo 'Environment variable $PUID not specified'
+	echo 'Environment variable $GUID not specified'
 	exit 1
 fi
 
 # create astrid user and group
-if [ ! $(getent group astrid) ]; then
+if [ ! $(getent group astrid) ] && [ ! $(getent group $GUID) ]; then
 	groupadd --gid $GUID astrid
 	echo "Group astrid with GID $GUID created."
 fi
-if [ ! $(getent passwd astrid) ]; then
+if [ ! $(getent passwd astrid) ] && [ ! $(getent passwd $PUID) ]; then
 	useradd --uid $PUID --gid $GUID --create-home --add-subids-for-system astrid
 	echo "User astrid with UID $PUID created."
 fi
