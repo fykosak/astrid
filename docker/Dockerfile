@@ -6,6 +6,7 @@ RUN apt update && apt install -y podman containers-storage
 # add astrid user
 ARG DOCKER_USER=astrid
 RUN useradd -m $DOCKER_USER
+RUN chmod 777 /home
 
 # change workdir
 WORKDIR /app

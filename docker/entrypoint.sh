@@ -7,6 +7,11 @@ if [ "$DATA_OWNER" -ne "$UID" ]; then
 	exit 1
 fi
 
+# create home folder
+export HOME="/home/$(id -u)"
+mkdir -p $HOME
+
+# create needed files if missing
 mkdir -p /data/config /data/containers /data/log /data/repos /data/ssh
 
 cp -n /app/config.ini.sample /data/config/config.ini
