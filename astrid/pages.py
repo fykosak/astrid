@@ -125,9 +125,10 @@ class BuilderPage(BasePage):
         image_version = self.repos.get(reponame, "image_version")
 
         print(f"Building {reponame}")
-        logfilename = os.path.expanduser(f"~/.astrid/{reponame}.build.log")
+        logfilename = os.path.expanduser(f"/data/log/{reponame}.build.log")
         logfile = open(logfilename, "w")
         p = subprocess.run(["podman", "run", "--rm", "-v", f"{cwd}:/usr/src/local", f"fykosak/buildtools:{image_version}"] + cmd.split(), cwd=cwd, stdout=logfile, stderr=logfile, check=False)
+        logfile.close()
         return p.returncode == 0
 
 class InfoPage(BasePage):

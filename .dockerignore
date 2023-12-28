@@ -1,2 +1,6 @@
 docker/*
 !docker/entrypoint.sh
+!docker/ssh.conf
+!docker/sshd.conf
+!docker/libpod.conf
+!docker/storage.conf

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import cherrypy
-import astrid
 import sys
 import os
+import cherrypy
 
 from cherrypy.process.plugins import Daemonizer
 from cherrypy.process.plugins import PIDFile
+
+import astrid
 
 print("Starting Astrid service")
 
@@ -16,7 +17,7 @@ argc = len(sys.argv)
 if argc == 1:
     daemon = False
 elif argc == 2 and sys.argv[1] == '-d':
-    pidfile = os.path.expanduser("~/.astrid/pidfile")
+    pidfile = os.path.expanduser("/data/pidfile")
     daemon = True
 elif argc == 3 and sys.argv[1] == '-d':
     pidfile = sys.argv[2]

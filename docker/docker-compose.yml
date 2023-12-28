@@ -12,10 +12,7 @@ services:
       TZ: 'Europe/Prague'
     privileged: true # needed for containers
     volumes:
-      - ./config:/app/config
-      - ./ssh:/home/astrid/.ssh
-      - ./containers:/home/astrid/.local/share/containers
-      - ./repos:/app/repos
+      - ./data:/data
     ports:
       - 8080:8080 # opened port mapping, not needed with proxy
-    user: 1000:1000 # expects the main user with uid:pid
+    user: 1000:1000 # expects the main user as uid:pid

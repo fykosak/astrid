@@ -13,10 +13,10 @@ class BuildLogger:
         self.repodir = repodir
 
     def _getLogfile(self, reponame):
-        return os.path.expanduser('~/.astrid/{}.log'.format(reponame))
+        return f'/data/log/{reponame}.log'
 
     def _getBuildlogfile(self, reponame):
-        return os.path.expanduser('~/.astrid/{}.build.log'.format(reponame))
+        return f'/data/log/{reponame}.build.log'
 
     def log(self, reponame, message, sendMail = False):
         logfile = self._getLogfile(reponame)
@@ -68,8 +68,8 @@ class BuildLogger:
 
 from configparser import ConfigParser
 
-REPOS_INI = '/app/config/repos.ini'
-CONFIG_INI = '/app/config/config.ini'
+REPOS_INI = '/data/config/repos.ini'
+CONFIG_INI = '/data/config/config.ini'
 
 repos = ConfigParser()
 repos.read(os.path.expanduser(REPOS_INI))

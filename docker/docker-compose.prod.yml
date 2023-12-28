@@ -9,8 +9,5 @@ services:
       TZ: 'Europe/Prague'
     privileged: true # needed for containers
     volumes:
-      - ./config:/home/astrid/.astrid
-      - ./ssh:/home/astrid/.ssh
-      - ./containers:/home/astrid/.local/share/containers
-      - ./repos:/data/repos
-    user: 1000:1000 # expects the main user with uid:pid
+      - ./data:/data
+    user: 1000:1000 # expects the main user as uid:pid
