@@ -2,6 +2,13 @@
 
 set -e
 
+function checksubid {
+	if [ $(grep -E "^$1:" $2 | wc -l) -eq 0 ]; then
+		exit 1
+	fi
+	exit 0
+}
+
 # check required variables
 if [ -z "$PUID" ]; then
 	echo 'Environment variable $PUID not specified'
@@ -23,17 +30,29 @@ if [ ! $(getent passwd astrid) ] && [ ! $(getent passwd $PUID) ]; then
 	echo "User astrid with UID $PUID created."
 fi
 
+USER=$(id -nu $PUID)
+
+# add to subuid and subgid
+if ! $(checksubid $USER /etc/subuid); then
+	echo "$USER:100000:65536" >> /etc/subuid
+fi
+
+if ! $(checksubid $USER /etc/subgid); then
+	echo "$USER:100000:65536" >> /etc/subgid
+fi
+
 # set ownership of /data to target user
 chown "$PUID:$GUID" /data
 
-# create needed files if missing
-su - astrid -c "mkdir -p /data/config /data/containers /data/log /data/repos /data/ssh"
 
-su - astrid -c "cp -n /app/config.ini.sample /data/config/config.ini"
-su - astrid -c "cp -n /app/repos.ini.sample  /data/config/repos.ini"
+# create needed files if missing
+su - $USER -c "mkdir -p /data/config /data/containers /data/log /data/repos /data/ssh"
+
+su - $USER -c "cp -n /app/config.ini.sample /data/config/config.ini"
+su - $USER -c "cp -n /app/repos.ini.sample  /data/config/repos.ini"
 
 if [ $(ls "/data/ssh" | grep ".pub" | wc -l) -eq 0 ]; then
-	su - astrid -c "ssh-keygen -t ed25519 -f /data/ssh/id_ed25519"
+	su - $USER -c "ssh-keygen -t ed25519 -f /data/ssh/id_ed25519"
 fi
 
-su - astrid -c "python3 -u /app/main"
+su - $USER -c "python3 -u /app/main"

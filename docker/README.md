@@ -7,3 +7,5 @@
      - stáhnutí `fykosak/buildtools` (potřeba před prvním buildem repozitáře): `docker exec -it astrid podman pull docker.io/fykosak/buildtools`
 - po fungování gitu potřeba přidat ssh klíč na cílový server
     - je možné, že ssh bude vyhazovat chybu špatně nastaveného přístupu k privátnímu klíči, v takovém případě je potřeba přes `chmod` nastavit privátnímu klíči práva `600`
+- Možno přes env_var `PUID` a `GUID` nastavit uživatele, pod kterým to pojede. Pozor ale na UID, které již můžou existovat v dockeru, potom se to rozbije.
+    - pokud je PUID nebo GUID změněno, je potřeba smazat starý kontejner (`docker rm astrid`) a znovu jej vytvořit

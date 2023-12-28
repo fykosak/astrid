@@ -10,7 +10,7 @@ services:
     container_name: astrid
     environment:
       TZ: 'Europe/Prague'
-      PUID: 1000
+      PUID: 950
       GUID: 65534
     privileged: true # needed for containers
     volumes:
