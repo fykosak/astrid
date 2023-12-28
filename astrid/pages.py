@@ -81,14 +81,13 @@ class BuilderPage(BasePage):
             lock.release()
 
     def _updateRepo(self, reponame):
-        print(f"Updating repository {reponame}")
         remotepath = self.repos.get(reponame, "path")
         submodules = self.repos.get(reponame, "submodules") if self.repos.has_option(reponame, "submodules") else False
         localpath = os.path.join(self.repodir, reponame)
 
         os.umask(0o007) # create repo content not readable to others
         if not os.path.isdir(localpath):
-            print(f"Repository {reponame} empty, creating")
+            print(f"Repository {reponame} empty, cloning")
             g = Git()
             g.clone(remotepath, localpath)
 

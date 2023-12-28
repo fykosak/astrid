@@ -7,8 +7,9 @@ services:
     container_name: astrid
     environment:
       TZ: 'Europe/Prague'
+      PUID: 1000
+      GUID: 1000
     privileged: true # needed for containers
     volumes:
       - ./data:/data
       - /etc/passwd:/etc/passwd:ro # needed for ssh-keygen to work
-    user: 1000:1000 # expects the main user as uid:pid
