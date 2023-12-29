@@ -126,7 +126,7 @@ class BuilderPage(BasePage):
         print(f"Building {reponame}")
         logfilename = os.path.expanduser(f"/data/log/{reponame}.build.log")
         logfile = open(logfilename, "w")
-        p = subprocess.run(["docker", "run", "--rm", "-v", f"{cwd}:/usr/src/local", f"fykosak/buildtools:{image_version}"] + cmd.split(), cwd=cwd, stdout=logfile, stderr=logfile, check=False)
+        p = subprocess.run(["docker", "run", "--rm", "-v", f"{cwd}:/usr/src/local", f"--user={os.getuid()}",  f"fykosak/buildtools:{image_version}"] + cmd.split(), cwd=cwd, stdout=logfile, stderr=logfile, check=False)
         logfile.close()
         return p.returncode == 0
 
