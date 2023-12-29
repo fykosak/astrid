@@ -31,6 +31,7 @@ if [ ! $(getent passwd astrid) ] && [ ! $(getent passwd $PUID) ]; then
 fi
 
 USER=$(id -nu $PUID)
+usermod -a -G docker $USER
 
 # add to subuid and subgid
 if ! $(checksubid $USER /etc/subuid); then
@@ -55,4 +56,5 @@ if [ $(ls "/data/ssh" | grep ".pub" | wc -l) -eq 0 ]; then
 	su - $USER -c "ssh-keygen -t ed25519 -f /data/ssh/id_ed25519"
 fi
 
+dockerd &
 su - $USER -c "python3 -u /app/main"

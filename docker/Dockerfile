@@ -1,7 +1,7 @@
 FROM python:3.12
 
 # install docker
-RUN apt update && apt install -y podman containers-storage
+RUN apt update && apt install -y docker.io containers-storage
 
 # change workdir
 WORKDIR /app
@@ -15,8 +15,7 @@ COPY ./docker/ssh.conf /etc/ssh/ssh_config.d/99-astrid.conf
 COPY ./docker/sshd.conf /etc/ssh/sshd_config.d/99-astrid.conf
 
 # copy containers config
-COPY ./docker/libpod.conf /etc/containers/libpod.conf
-COPY ./docker/storage.conf /etc/containers/storage.conf
+COPY ./docker/daemon.json /etc/docker/daemon.json
 
 # install astrid
 COPY . .

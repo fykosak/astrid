@@ -1,0 +1,6 @@
+{
+	"data-root": "/data/containers",
+	"live-restore": true,
+	"log-driver": "json-file",
+	"init": true
+}
