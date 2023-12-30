@@ -2,6 +2,7 @@ import os.path
 import os
 import subprocess
 import time
+from threading import Thread
 import cherrypy
 
 from git import Repo, Git, GitCommandError
@@ -11,10 +12,11 @@ from astrid.templating import Template
 import astrid.server
 
 class BasePage(object):
-    def __init__(self, repodir, repos, locks):
+    def __init__(self, repodir, repos, locks, waitLocks):
         self.repos = repos
         self.repodir = repodir
         self.locks = locks
+        self.waitLocks = waitLocks
 
     def _checkAccess(self, reponame):
         user = cherrypy.request.login
@@ -37,48 +39,70 @@ class BuilderPage(BasePage):
             raise cherrypy.HTTPError(404)
 
         self._checkAccess(reponame)
+
+        user = cherrypy.request.login
+
+        thread = Thread(target=self._queueJob, args=(reponame,user))
+        thread.daemon = True
+        thread.start()
+
+        raise cherrypy.HTTPRedirect("/")
+
+    def _queueJob(self, reponame, user):
         lock = self.locks[reponame]
+        waitLock = self.waitLocks[reponame]
+
+        # if job is not running
+        if lock.acquire(blocking=False):
+            # lock job running and run job
+            try:
+                self._runJob(reponame, user)
+            finally: # ensure lock release on exception
+                lock.release() # release lock for job run
+            return
+
+        # if job is already running
+        if not waitLock.acquire(blocking=False): # if another process is already waiting
+            return # skip waiting
+
+        # if it's not waiting
+        # we now own lock for waiting
+        lock.acquire() # wait for job lock to release and acquire it
+        waitLock.release() # relase lock for waiting
+        try:
+            self._runJob(reponame, user) # run job
+        finally: # ensure lock release on exception
+            lock.release() # release lock for job run
+
+    def _runJob(self, reponame, user):
         msg = None
         sendMail = False
 
-        lock.acquire()
+        time_start = time.time()
+        time_end = None
+
         try:
+            repo = self._updateRepo(reponame)
             try:
-                time_start = time.time()
-                time_end = None
-                repo = self._updateRepo(reponame)
-                try:
-                    if self._build(reponame):
-                        msg = f"#{repo.head.commit.hexsha[0:6]} Build succeeded."
-                        msg_class = "green"
-                        time_end = time.time()
-                    else:
-                        msg = f"#{repo.head.commit.hexsha[0:6]} Build failed."
-                        msg_class = "red"
-                        time_end = time.time()
-                except:
-                    msg = f"#{repo.head.commit.hexsha[0:6]} Build error."
-                    msg_class = "red"
-                    raise
-            except GitCommandError as e:
-                msg = f"Pull error. ({e})"
-                msg_class = "red"
-                sendMail = True
+                if self._build(reponame):
+                    msg = f"#{repo.head.commit.hexsha[0:6]} Build succeeded."
+                    time_end = time.time()
+                else:
+                    msg = f"#{repo.head.commit.hexsha[0:6]} Build failed."
+                    time_end = time.time()
+            except:
+                msg = f"#{repo.head.commit.hexsha[0:6]} Build error."
                 raise
+        except GitCommandError as e:
+            msg = f"Pull error. ({e})"
+            sendMail = True
+            raise
 
-            if time_end is not None:
-                msg += " ({:.2f} s)".format(time_end - time_start)
+        if time_end is not None:
+            msg += " ({:.2f} s)".format(time_end - time_start)
 
-            template = Template("templates/build.html")
-            template.assignData("reponame", reponame)
-            template.assignData("message", msg)
-            template.assignData("msg_class", msg_class)
-            template.assignData("pagetitle", "Build")
-            return template.render()
-        finally:
-            logger = BuildLogger(self.repodir)
-            logger.log(reponame, msg, sendMail)
-            lock.release()
+        logger = BuildLogger(self.repodir)
+        logger.log(reponame, user, msg, sendMail)
 
     def _updateRepo(self, reponame):
         remotepath = self.repos.get(reponame, "path")
