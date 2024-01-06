@@ -12,4 +12,3 @@ services:
     privileged: true # needed for containers
     volumes:
       - ./data:/data
-      - /etc/passwd:/etc/passwd:ro # needed for ssh-keygen to work
