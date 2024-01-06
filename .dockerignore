@@ -1,0 +1,5 @@
+docker/*
+!docker/entrypoint.sh
+!docker/ssh.conf
+!docker/sshd.conf
+!docker/daemon.json

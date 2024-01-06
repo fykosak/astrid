@@ -3,3 +3,4 @@ dist
 astrid.egg-info/
 *~
 *.pyc
+docker/data

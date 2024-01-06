@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  astrid:
+    image: ghcr.io/fykosak/astrid:master
+    restart: on-failure:3
+    container_name: astrid
+    environment:
+      TZ: 'Europe/Prague'
+      PUID: 1000
+      GUID: 1000
+    privileged: true # needed for containers
+    volumes:
+      - ./data:/data

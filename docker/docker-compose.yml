@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  astrid:
+    image: astrid
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: on-failure:3
+    container_name: astrid
+    environment:
+      TZ: 'Europe/Prague'
+      PUID: 1000
+      GUID: 65534
+    privileged: true # needed for containers
+    volumes:
+      - ./data:/data
+    ports:
+      - 8080:8080 # opened port mapping, not needed with proxy
