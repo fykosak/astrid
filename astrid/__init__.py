@@ -8,31 +8,30 @@ import threading
 
 class BuildLogger:
     separator = ";"
-    
+
     def __init__(self, repodir):
         self.repodir = repodir
-        
+
     def _getLogfile(self, reponame):
-        return os.path.expanduser('~/.astrid/{}.log'.format(reponame))
+        return f'/data/log/{reponame}.log'
 
     def _getBuildlogfile(self, reponame):
-        return os.path.expanduser('~/.astrid/{}.build.log'.format(reponame))
-         
-    def log(self, reponame, message, sendMail = False):
+        return f'/data/log/{reponame}.build.log'
+
+    def log(self, reponame, user, message, sendMail = False):
         logfile = self._getLogfile(reponame)
         f = open(logfile, "a")
-        user = cherrypy.request.login
         f.write(BuildLogger.separator.join([datetime.now().isoformat(' '), message, user]) + "\n")
         f.close()
-    
+
         if sendMail:
             self._sendMail(reponame, message)
-    
+
     def getLogs(self, reponame):
         logfile = self._getLogfile(reponame)
         try:
             f = open(logfile, "r")
-                
+
             records = [row.split(BuildLogger.separator) for row in reversed(list(f))]
             f.close()
             return records
@@ -68,8 +67,8 @@ class BuildLogger:
 
 from configparser import ConfigParser
 
-REPOS_INI = '~/.astrid/repos.ini'
-CONFIG_INI = '~/.astrid/config.ini'
+REPOS_INI = '/data/config/repos.ini'
+CONFIG_INI = '/data/config/config.ini'
 
 repos = ConfigParser()
 repos.read(os.path.expanduser(REPOS_INI))
@@ -80,14 +79,13 @@ cherrypy.config.update(config)
 
 # prepare locks for each repository
 locks = {section: threading.Lock() for section in repos.sections()}
+waitLocks = {section: threading.Lock() for section in repos.sections()}
 
 from astrid.pages import BuilderPage, InfoPage, DashboardPage, BuildlogPage
 
 repodir = cherrypy.config.get("repodir")
 
-root = DashboardPage(repodir, repos, locks)
-root.build = BuilderPage(repodir, repos, locks)
-root.info = InfoPage(repodir, repos, locks)
-root.buildlog = BuildlogPage(repodir, repos, locks)
-
-       
+root = DashboardPage(repodir, repos, locks, waitLocks)
+root.build = BuilderPage(repodir, repos, locks, waitLocks)
+root.info = InfoPage(repodir, repos, locks, waitLocks)
+root.buildlog = BuildlogPage(repodir, repos, locks, waitLocks)
