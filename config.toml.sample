@@ -1,0 +1,38 @@
+# Flask config file
+#
+# This file is loaded by flask to app.config.
+# It can overload flask configuration (https://flask.palletsprojects.com/en/3.0.x/config/)
+# and it load custom config values for the app.
+# All variable names must be upper case for flask to load them.
+#
+
+# Flask debug mode
+# set to true for development
+DEBUG = false
+
+# Flask tests
+# set to true for development
+TESTING = false
+
+# Secret key used for session encryption
+# set to long random string for security
+SECRET_KEY = '<secret>' # CHANGE THIS!
+
+[OAUTH]
+
+# Client ID created in OIDC provider (keycloak)
+CLIENT_ID = '<client-id>'
+
+# Client secret from OIDC provider (keycloak)
+CLIENT_SECRET = '<client-secret>'
+
+# URL for oauth client to pull information about openid configuration
+SERVER_METADATA_URL = 'https://<oidc-url>/realms/master/.well-known/openid-configuration'
+
+[GUNICORN]
+
+# The number of worker processes for handling requests
+THREADS = 2
+
+# The number of worker threads in each process for handling requests
+WORKERS = 4

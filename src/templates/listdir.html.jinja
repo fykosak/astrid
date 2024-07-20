@@ -1,0 +1,35 @@
+{% extends "base.html.jinja" %}
+{% block title %}{{repo}}{% endblock %}
+{% block content %}
+<h1>Directory listing for {{path}}</h1>
+<table>
+	<thead>
+		<tr>
+			<th>File</th>
+			<th>Size</th>
+			<th>Last modified</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><a href="..">../</a></td>
+			<td></td>
+			<td></td>
+		</tr>
+		{% for dir in dirs %}
+		<tr>
+			<td><a href="{{dir}}/">{{dir}}/</a></td>
+			<td></td>
+			<td></td>
+		</tr>
+		{% endfor %}
+		{% for file in files %}
+		<tr>
+			<td><a href="{{file}}">{{file}}</a></td>
+			<td></td>
+			<td></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

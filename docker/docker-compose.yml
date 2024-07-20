@@ -1,4 +1,4 @@
-version: '3'
+name: astrid
 
 services:
   astrid:
@@ -12,8 +12,10 @@ services:
       TZ: 'Europe/Prague'
       PUID: 1000
       GUID: 65534
+      MODE: 'development'
     privileged: true # needed for containers
     volumes:
       - ./data:/data
+      - ..:/app
     ports:
       - 8080:8080 # opened port mapping, not needed with proxy
