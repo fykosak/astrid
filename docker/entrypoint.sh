@@ -51,6 +51,7 @@ su - $USER -c "mkdir -p /data/config /data/containers /data/log /data/repos /dat
 
 su - $USER -c "cp -n /app/config.toml.sample /data/config/config.toml"
 su - $USER -c "cp -n /app/repos.toml.sample  /data/config/repos.toml"
+su - $USER -c "cp -n /app/users.toml.sample  /data/config/users.toml"
 
 if [ $(ls "/data/ssh" | grep ".pub" | wc -l) -eq 0 ]; then
 	su - $USER -c "ssh-keygen -t ed25519 -f /data/ssh/id_ed25519"

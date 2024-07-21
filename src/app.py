@@ -1,12 +1,10 @@
+from datetime import datetime
 from flask import Flask, abort, redirect, render_template, send_from_directory, session, url_for
-import configparser
 import os
 import tomllib
 
 from repository import Repository
-from oauth import isLoggedIn, registerAuthRoutes, requireLogin
-
-# TODO run using gunicorn for more threads
+from auth import isLoggedIn, registerAuthRoutes, requireLogin
 
 app = Flask(__name__,
             static_folder='static',
@@ -18,8 +16,6 @@ app.config.from_file("/data/config/config.toml", load=tomllib.load, text=False)
 registerAuthRoutes(app)
 
 # load repos
-#reposConfig = configparser.ConfigParser()
-#reposConfig.read('/data/config/repos.ini')
 with open('/data/config/repos.toml', 'rb') as file:
     reposConfig = tomllib.load(file)
 
@@ -29,6 +25,13 @@ repos = {repo: Repository(repo, '/data/repos/', reposConfig[repo]) for repo in r
 @app.context_processor
 def inject_user():
     return dict(user = session.get('user'))
+
+def human_readable_size(size):
+    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+        if size < 1024.0 or unit == 'PiB':
+            value = f"{size:.2f}".rstrip('0').rstrip('.')
+            return f"{value} {unit}"
+        size /= 1024.0
 
 #
 # routes
@@ -99,8 +102,26 @@ def repository(repoName, path=''):
     if os.path.isdir(targetPath):
         directoryContent = next(os.walk(targetPath))
         # filter directories and files starting with .
-        dirs=[d for d in sorted(directoryContent[1]) if not d.startswith('.')]
-        files=[f for f in sorted(directoryContent[2]) if not f.startswith('.')]
+        dirNames=[d for d in sorted(directoryContent[1]) if not d.startswith('.')]
+        fileNames=[f for f in sorted(directoryContent[2]) if not f.startswith('.')]
+
+        # get file metadata
+        dirs = []
+        for dirName in dirNames:
+            filepath = os.path.join(targetPath, dirName)
+            modifiedTime = datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat(' ', timespec='seconds')
+            dirs.append([
+                dirName, '-', modifiedTime
+            ])
+
+        files = []
+        for fileName in fileNames:
+            filepath = os.path.join(targetPath, fileName)
+            size = human_readable_size(os.path.getsize(filepath))
+            modifiedTime = datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat(' ', timespec='seconds')
+            files.append([
+                fileName, size, modifiedTime
+            ])
 
         return render_template('listdir.html.jinja', path=os.path.normpath(os.path.join(repoName, normalizedPath)), repo=repoName, dirs=dirs, files=files)
 

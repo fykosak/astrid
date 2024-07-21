@@ -6,7 +6,7 @@ from git import Repo, Git, GitCommandError
 import os
 import subprocess
 
-from oauth import isLoggedIn
+from auth import isLoggedIn
 
 class Repository:
     def __init__(self, name: str, repodir: str, repoConfig: dict):
@@ -118,7 +118,7 @@ class Repository:
         self.logger.log(user, msg, sendMail)
 
     def _updateRepo(self, reponame):
-        remotepath = self.config['path']
+        remotepath = self.config['git_path']
         submodules = self.config['submodules'] if 'submodules' in self.config else False
         localpath = os.path.join(self.repodir, reponame)
 
@@ -165,4 +165,5 @@ class Repository:
         logfile = open(logfilename, "w")
         p = subprocess.run(["docker", "run", "--rm", "-v", f"{cwd}:/usr/src/local", f"--user={os.getuid()}:{os.getgid()}",  f"fykosak/buildtools:{image_version}"] + cmd.split(), cwd=cwd, stdout=logfile, stderr=logfile, check=False)
         logfile.close()
+        print(f"Building {reponame} completed")
         return p.returncode == 0
