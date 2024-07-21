@@ -16,7 +16,7 @@ TESTING = false
 
 # Secret key used for session encryption
 # set to long random string for security
-SECRET_KEY = '<secret>' # CHANGE THIS!
+# SECRET_KEY = '<secret>' # CHANGE THIS!
 
 [OAUTH]
 

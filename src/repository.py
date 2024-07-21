@@ -64,7 +64,16 @@ class Repository:
         Thread(target=self._queueJob, args=(self.name, session['user']['name'])).start()
 
     def _queueJob(self, reponame, user):
+        """
+            Queue a job run.
 
+            If no job is running for repository, exclusive lock is obtained
+            and job is executed. If another job is already running, lock for
+            waiting and job is waiting for first job to finish, then runs.
+            If one job is running and second is waiting, job run is skipped
+            as git pull of the waiting job will update to the newest state
+            of repository anyway.
+        """
         # if job is not running
         if self.runningLock.acquire(blocking=False):
             # lock job running and run a job
@@ -89,6 +98,11 @@ class Repository:
             self.runningLock.release() # release lock for job run
 
     def _runJob(self, reponame, user):
+        """
+            Run a build job
+
+            The repository is pulled first, than build is started.
+        """
         msg = None
         sendMail = False
 
