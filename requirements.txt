@@ -1,2 +1,5 @@
-CherryPy
 GitPython
+Flask
+AuthLib
+requests
+gunicorn

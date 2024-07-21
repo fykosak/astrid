@@ -1,0 +1,8 @@
+{% extends "base.html.jinja" %}
+{% block title %}{{repo}} buildlog{% endblock %}
+{% block content %}
+<h1>Build log for repository {{repo}}</h1>
+<pre>
+{{log}}
+</pre>
+{% endblock %}

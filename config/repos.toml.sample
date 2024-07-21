@@ -1,0 +1,12 @@
+# Repos config file
+#
+# Declares all repositories in this app. Each repository is its own section
+# specified by [reponame] with listed config values.
+#
+
+[fykos37] # reponame
+git_path='gitea@fykos.cz:FYKOS/fykos37.git' # ssh address of git repository, string
+allowed_roles=['fksdb-fykos'] # array of allowed users, array of strings
+build_cmd='make -k all' # build command, string
+image_version='latest' # docker image version of buildtools, string, optional (default 'latest')
+submodules=false # does repo have submodules, bool, optional (default false)

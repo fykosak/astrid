@@ -1,5 +1,9 @@
 FROM python:3.12
 
+# tells entrypoint if it's a production or development environment
+# and should run gunicorn or not
+ENV MODE="production"
+
 # install docker
 RUN apt update && apt install -y docker.io containers-storage
 

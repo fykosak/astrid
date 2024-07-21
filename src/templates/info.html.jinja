@@ -1,0 +1,25 @@
+{% extends "base.html.jinja" %}
+{% block title %}{{repo}} info{% endblock %}
+{% block content %}
+<h1>Information for {{repo}}</h1>
+<p><a href="/buildlog/{{repo}}">Buildlog</a></p>
+<table>
+	<thead>
+		<tr>
+			<th>Time</th>
+			<th>Message</th>
+			<th>User</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for row in log %}
+		<tr>
+			<td>{{row[0]}}</td>
+			<td>{{row[1]}}</td>
+			<td>{{row[2]}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+
