@@ -10,6 +10,13 @@ app = Flask(__name__,
             static_folder='static',
             template_folder='templates')
 
+# This section is needed for url_for("foo", _external=True) to automatically
+# generate http scheme when this sample is running on localhost,
+# and to generate https scheme when it is deployed behind reversed proxy.
+# See also https://flask.palletsprojects.com/en/2.2.x/deploying/proxy_fix/
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 # load config
 app.config.from_file("/data/config/config.toml", load=tomllib.load, text=False)
 
