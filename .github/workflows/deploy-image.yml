@@ -4,13 +4,6 @@ on:
   push:
     branchers:
       - master
-      - dev-docker
-    paths:
-      - 'astrid/**'
-      - 'docker/**'
-      - 'main'
-      - 'requirements.txt'
-      - '.github/workflows/deploy-image.yml'
 
 env:
   REGISTRY: ghcr.io
