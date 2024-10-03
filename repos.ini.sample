@@ -1,6 +1,0 @@
-[fykos37]
-path=gitea@fykos.cz:FYKOS/fykos37.git
-users=user
-image_version=latest
-build_usr=astrid
-build_cmd=make -k all

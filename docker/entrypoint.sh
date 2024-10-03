@@ -49,12 +49,17 @@ chown "$PUID:$GUID" /data
 # create needed files if missing
 su - $USER -c "mkdir -p /data/config /data/containers /data/log /data/repos /data/ssh"
 
-su - $USER -c "cp -n /app/config.ini.sample /data/config/config.ini"
-su - $USER -c "cp -n /app/repos.ini.sample  /data/config/repos.ini"
+su - $USER -c "cp -n /app/config/config.toml.sample /data/config/config.toml"
+su - $USER -c "cp -n /app/config/repos.toml.sample  /data/config/repos.toml"
+su - $USER -c "cp -n /app/config/users.toml.sample  /data/config/users.toml"
 
 if [ $(ls "/data/ssh" | grep ".pub" | wc -l) -eq 0 ]; then
 	su - $USER -c "ssh-keygen -t ed25519 -f /data/ssh/id_ed25519"
 fi
 
 dockerd &
-su - $USER -c "python3 -u /app/main"
+if [ "$MODE" == "development" ]; then
+	su - $USER -c "python3 -u /app/src/app.py"
+else
+	su - $USER -c "gunicorn --config /app/src/gunicorn.conf.py --chdir /app/src"
+fi

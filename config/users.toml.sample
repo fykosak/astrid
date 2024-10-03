@@ -1,0 +1,12 @@
+# Basic auth users
+#
+# Specifies user by using username as [section] and setting password
+# and roles properties.
+
+[username1]
+password = "password"
+roles = ["role1", "role2"]
+
+[username2]
+password = "password"
+roles = ["role1"]

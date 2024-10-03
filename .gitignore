@@ -1,6 +1,2 @@
-build
-dist
-astrid.egg-info/
-*~
-*.pyc
+**__pycache__
 docker/data

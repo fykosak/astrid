@@ -1,0 +1,14 @@
+{% extends "base.html.jinja" %}
+{% block title %}Astrid{% endblock %}
+{% block content %}
+<h1>Astrid</h1>
+<p>Please choose a repository:</p>
+<ul>
+{% for repo in repos.values() %}
+	{% if repo.checkAccess() %}
+		<li><a href='{{ repo.name }}'>{{ repo.name }}</a> (<a href='info/{{repo.name}}'>info</a>{% if repo.isBuilding() %}, building{% endif %})</li>
+	{% endif %}
+{% endfor %}
+</ul>
+{% endblock %}
+
