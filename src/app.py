@@ -106,6 +106,9 @@ def repository(repoName, path=''):
     if not os.path.exists(targetPath):
         abort(404)
 
+    if (path != '' and os.path.isdir(targetPath) and path[-1] != '/'):
+        return redirect(url_for('repository', repoName = repoName, path=path+'/'))
+
     if os.path.isdir(targetPath):
         directoryContent = next(os.walk(targetPath))
         # filter directories and files starting with .
