@@ -3,3 +3,4 @@ Flask
 AuthLib
 requests
 gunicorn
+python-magic

@@ -1,14 +1,52 @@
 {% extends "base.html.jinja" %}
-{% block title %}Astrid{% endblock %}
+{% block title %}Select Repository{% endblock %}
 {% block content %}
-<h1>Astrid</h1>
-<p>Please choose a repository:</p>
-<ul>
-{% for repo in repos.values() %}
-	{% if repo.checkAccess() %}
-		<li><a href='{{ repo.name }}'>{{ repo.name }}</a> (<a href='info/{{repo.name}}'>info</a>{% if repo.isBuilding() %}, building{% endif %})</li>
-	{% endif %}
-{% endfor %}
-</ul>
+<h2 class="mb-4">Select Repository:</h2>
+<div class="list-group">
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Repository Name</th>
+            <th>Build Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for repo in repos.values() %}
+            {% if repo.checkAccess() %}
+                <tr>
+                    <td>
+                        <a href='{{ url_for('repository', repo_name=repo.name) }}' class="text-decoration-none d-block w-100 h-100">
+                            <span class="fw-bold">{{ repo.name }}</span>
+                            {% if repo.isBuilding() %}
+                                <span class="ms-2 text-muted">(Building...)</span>
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td>
+                        {% set status = repo.logger.get_current_build_status() %}
+                        <span class="fw-bold {% if status.status == 'succeeded' %}text-success{% elif status.status == 'failed' %}text-danger{% else %}text-warning{% endif %}">
+                            {{ status.status | capitalize }}
+                        </span>
+                        <br>
+                        <small class="text-muted">{{ status.timeinfo }} by {{ status.user }}</small>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('repository', repo_name=repo.name) }}" class="btn btn-primary mb-2">
+                            <i class="bi bi-folder2-open"></i> Open Repo
+                        </a>
+                        <a href="{{ url_for('info', repo_name=repo.name) }}" class="btn btn-info mb-2">
+                            <i class="bi bi-clock-history"></i> Build History
+                        </a>
+                        <a href="{{ url_for('buildlog', repo_name=repo.name) }}" class="btn btn-secondary mb-2">
+                            <i class="bi bi-file-text"></i> Buildlog
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+</div>
 {% endblock %}
 
