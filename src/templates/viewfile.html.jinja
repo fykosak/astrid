@@ -1,0 +1,41 @@
+{% extends "base.html.jinja" %}
+{% block title %}View File{% endblock %}
+{% block content %}
+
+{% include "path_breadcrumb.html.jinja" %}
+
+<div class="mb-3">
+    <a href="{{ url_for('download_file', repo_name=repo_name, path=path) }}" class="btn btn-primary">
+        <i class="bi bi-download"></i> Download File
+    </a>
+</div>
+
+{% if file_display_type == 'text' %}
+    <pre class="p-4 bg-dark text-light border border-secondary rounded"><code>{{ file_content | e }}</code></pre>
+{% elif file_display_type == 'preview' %}
+    <div class="d-flex flex-column">
+        <button id="fullscreen-btn" class="btn btn-secondary mb-2 align-self-end">
+            <i class="bi bi-fullscreen"></i> Fullscreen
+        </button>
+        <iframe id="preview-iframe" src="{{ url_for('download_file', repo_name=repo_name, path=path) }}" style="height: 100vh; width: 100%"></iframe>
+    </div>
+    <script>
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+            var iframe = document.getElementById('preview-iframe');
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.mozRequestFullScreen) {
+                iframe.mozRequestFullScreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) {
+                iframe.msRequestFullscreen();
+            }
+        });
+    </script>
+{% elif file_display_type == 'image' %}
+    <img src="{{ url_for('download_file', repo_name=repo_name, path=path) }}" alt="Image preview" class="img-fluid" style="max-height: 80vh; width: auto; display: block; margin: 0 auto;">
+{% else %}
+    <p>File type not supported for preview. Please use the download button above to view the file.</p>
+{% endif %}
+{% endblock %}
