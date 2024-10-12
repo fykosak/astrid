@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, abort, redirect, render_template, send_from_directory, session, url_for, abort
+from flask import Flask, abort, redirect, render_template, send_from_directory, session, url_for, request
 import os
 import tomllib
 from functools import wraps
@@ -122,7 +122,7 @@ def create_breadcrumbs(repo: Repository, normalized_path):
 @requireLogin
 @repo_required
 def repository(repo: Repository, path=''):
-    _, normalized_path, target_path = check_and_parse_path(repo, path)
+    repo_dir, normalized_path, target_path = check_and_parse_path(repo, path)
     if (path != '' and os.path.isdir(target_path) and path[-1] != '/'):
         return redirect(url_for('repository', repo_name=repo.name, path=path+'/'))
 
@@ -153,14 +153,16 @@ def repository(repo: Repository, path=''):
         return render_template('listdir.html.jinja', path=os.path.normpath(os.path.join(repo.name, normalized_path)), repo_name=repo.name, dirs=dirs, files=files, breadcrumbs=create_breadcrumbs(repo, normalized_path))
 
     if os.path.isfile(target_path):
+        if request.headers.get('Accept') == '*/*':
+            return send_from_directory(repo_dir, normalized_path)
         file_display_type = 'other'
         file_content = None
 
         mime = magic.Magic(mime=True)
         detected_mime = mime.from_file(target_path)
-        if detected_mime == 'application/pdf':
-            file_display_type = 'preview'
-        elif detected_mime.startswith('text/') or detected_mime in ["application/json"]:
+        if detected_mime in ['application/pdf', 'text/xml', "application/json"]:
+            return send_from_directory(repo_dir, normalized_path)
+        elif detected_mime.startswith('text/'):
             file_display_type = 'text'
             with open(target_path, 'r', encoding='utf-8', errors='ignore') as file:
                 file_content = file.read()
