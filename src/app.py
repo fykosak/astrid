@@ -77,12 +77,15 @@ def archive():
 def info(repo: Repository):
     logs = repo.logger.getLogs()
     formatted_logs = []
-    for log in logs:
-        commit_hash = log[1].split()[0][1:]
-        try:
-            commit_msg, commit_author, commit_url = repo.get_commit_info(commit_hash)
-            formatted_commit_info = f"<a href='{commit_url}' target='_blank'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
-        except Exception as e:
+    for i, log in enumerate(logs):
+        if i < 10:
+            commit_hash = log[1].split()[0][1:]
+            try:
+                commit_msg, commit_author, commit_url = repo.get_commit_info(commit_hash)
+                formatted_commit_info = f"<a href='{commit_url}' target='_blank'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
+            except Exception as e:
+                formatted_commit_info = ''
+        else:
             formatted_commit_info = ''
         formatted_logs.append((log[0], log[1], log[2], formatted_commit_info))
     
