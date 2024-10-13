@@ -4,6 +4,8 @@ import os
 import tomllib
 from functools import wraps
 import magic
+import re
+from html import escape
 
 from repository import Repository
 from auth import isLoggedIn, registerAuthRoutes, requireLogin
@@ -95,7 +97,15 @@ def info(repo: Repository):
 @requireLogin
 @repo_required
 def buildlog(repo: Repository):
-    return render_template('buildlog.html.jinja', repo_name=repo.name, log=repo.logger.getBuildLog())
+    build_log = repo.logger.getBuildLog()
+    if build_log is None:
+        highlighted_log = None
+    else:
+        warning_pattern = re.compile(r'(warn(ing)*)', re.IGNORECASE)
+        error_pattern = re.compile(r'(error)', re.IGNORECASE)
+        highlighted_log = warning_pattern.sub(r'<span class="fw-bold text-warning">\1</span>', escape(build_log))
+        highlighted_log = error_pattern.sub(r'<span class="fw-bold text-danger">\1</span>', highlighted_log)
+    return render_template('buildlog.html.jinja', repo_name=repo.name, log=highlighted_log)
 
 @app.route('/build/<string:repo_name>')
 @requireLogin
