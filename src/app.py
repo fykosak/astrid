@@ -60,22 +60,33 @@ def human_readable_size(size):
 @app.route('/')
 def index():
     if isLoggedIn():
-        for repo in repos.values():
-            if repo.checkAccess():
-                logs = repo.logger.getLogs()
-                if logs:
-                    last_log = logs[0]
-                    repo.last_build_status = last_log[1]  # Assuming the message is in the second position
-                else:
-                    repo.last_build_status = "No builds yet"
-        return render_template('index.html.jinja', repos=repos)
+        filtered_repos = {name: repo for name, repo in repos.items() if not repo.config.get('archived', False)}
+        return render_template('index.html.jinja', repos=filtered_repos)
+    return render_template('signin.html.jinja')
+
+@app.route('/archive')
+@requireLogin
+def archive():
+    if isLoggedIn():
+        return render_template('index.html.jinja', repos=repos, archive=True)
     return render_template('signin.html.jinja')
 
 @app.route('/info/<string:repo_name>')
 @requireLogin
 @repo_required
 def info(repo: Repository):
-    return render_template('info.html.jinja', repo_name=repo.name, log=repo.logger.getLogs())
+    logs = repo.logger.getLogs()
+    formatted_logs = []
+    for log in logs:
+        commit_hash = log[1].split()[0][1:]
+        try:
+            commit_msg, commit_author, commit_url = repo.get_commit_info(commit_hash)
+            formatted_commit_info = f"<a href='{commit_url}' target='_blank'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
+        except Exception as e:
+            formatted_commit_info = ''
+        formatted_logs.append((log[0], log[1], log[2], formatted_commit_info))
+    
+    return render_template('info.html.jinja', repo_name=repo.name, log=formatted_logs)
 
 @app.route('/buildlog/<string:repo_name>')
 @requireLogin
@@ -106,7 +117,9 @@ def check_and_parse_path(repo: Repository, path):
     return repo_dir, normalized_path, target_path
 
 def create_breadcrumbs(repo: Repository, normalized_path):
-    path_parts = ["All Repos", repo.name] + normalized_path.split(os.path.sep)
+    path_parts = ["All Repos", repo.name]
+    if normalized_path != ".":
+        path_parts += normalized_path.split(os.path.sep)
     breadcrumbs = []
     for i, part in enumerate(path_parts):
         if i == 0:
@@ -179,7 +192,7 @@ def repository(repo: Repository, path=''):
 
     abort(404)
 
-@app.route('/download_file/<string:repo_name>/<path:path>')
+@app.route('/download-file/<string:repo_name>/<path:path>')
 @requireLogin
 @repo_required
 def download_file(repo: Repository, path=''):

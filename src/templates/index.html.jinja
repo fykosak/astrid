@@ -1,14 +1,37 @@
 {% extends "base.html.jinja" %}
-{% block title %}Select Repository{% endblock %}
+{% block title %}
+    {% if archive %}
+        Repository Archive
+    {% else %}
+        Active Repositories
+    {% endif %}
+{% endblock %}
 {% block content %}
-<h2 class="mb-4">Select Repository:</h2>
+<h2 class="mb-3">
+{% if archive %}
+    <i class="bi bi-archive"></i> Repository Archive
+{% else %}
+    Active Repositories
+{% endif %}
+</h2>
+
+{% if archive %}
+<a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">
+    <i class="bi bi-arrow-left"></i> Show Only Active
+</a>
+{% else %}
+<a href="{{ url_for('archive') }}" class="btn btn-secondary mb-3">
+    <i class="bi bi-archive"></i> Show Archived
+</a>
+{% endif %}
+
 <div class="list-group">
 <table class="table table-hover">
     <thead>
         <tr>
             <th>Repository Name</th>
             <th>Build Status</th>
-            <th>Actions</th>
+            <th class="text-end">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -24,22 +47,22 @@
                         </a>
                     </td>
                     <td>
-                        {% set status = repo.logger.get_current_build_status() %}
-                        <span class="fw-bold {% if status.status == 'succeeded' %}text-success{% elif status.status == 'failed' %}text-danger{% else %}text-warning{% endif %}">
+                        {% set status = repo.get_current_build_status() %}
+                        <span class="badge {% if status.status == 'succeeded' %}bg-success{% elif status.status == 'failed' %}bg-danger{% else %}bg-warning{% endif %}">
                             {{ status.status | capitalize }}
                         </span>
-                        <br>
-                        <small class="text-muted">{{ status.timeinfo }} by {{ status.user }}</small>
+                        <small class="text-muted">{{ status.timeinfo }}</small>
+                        <small class="text-muted">{{ status.commit }}</small>
                     </td>
-                    <td>
-                        <a href="{{ url_for('repository', repo_name=repo.name) }}" class="btn btn-primary mb-2">
+                    <td class="text-end">
+                        <a href="{{ url_for('repository', repo_name=repo.name) }}" class="btn btn-outline-primary btn-sm mb-2 mb-md-0">
                             <i class="bi bi-folder2-open"></i> Open Repo
                         </a>
-                        <a href="{{ url_for('info', repo_name=repo.name) }}" class="btn btn-info mb-2">
+                        <a href="{{ url_for('info', repo_name=repo.name) }}" class="btn btn-outline-info btn-sm mb-2 mb-md-0">
                             <i class="bi bi-clock-history"></i> Build History
                         </a>
-                        <a href="{{ url_for('buildlog', repo_name=repo.name) }}" class="btn btn-secondary mb-2">
-                            <i class="bi bi-file-text"></i> Buildlog
+                        <a href="{{ url_for('buildlog', repo_name=repo.name) }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-file-text"></i> Build Log
                         </a>
                     </td>
                 </tr>
