@@ -6,7 +6,7 @@
     <i class="bi bi-arrow-left"></i> Back
 </a>
 <a href="{{ url_for('buildlog', repo_name=repo_name) }}" class="btn btn-primary mb-3">
-    <i class="bi bi-file-text"></i> Buildlog
+    <i class="bi bi-file-text"></i> Build Log
 </a>
 <table class="table table-striped table-hover">
 	<thead class="table-light">
@@ -14,6 +14,7 @@
 			<th scope="col">Time</th>
 			<th scope="col">Message</th>
 			<th scope="col">User</th>
+			<th scope="col">Commit</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -22,6 +23,7 @@
 			<td>{{row[0]}}</td>
 			<td class="{% if 'failed' in row[1].lower() %}text-danger{% elif 'succeeded' in row[1].lower() %}text-success{% else %}text-secondary{% endif %}">{{row[1]}}</td>
 			<td>{{row[2]}}</td>
+			<td>{{row[3]}}</td>
 		</tr>
 		{% endfor %}
 	</tbody>

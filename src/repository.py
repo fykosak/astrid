@@ -1,6 +1,7 @@
 from flask import session
 from logger import Logger
 import time
+from datetime import datetime
 from threading import Thread, Lock
 from git import Repo, Git, GitCommandError
 import os
@@ -45,6 +46,13 @@ class Repository:
                 raise TypeError(f'Config value `submodules` must be a bool in repository {name}')
         else:
             self.config['submodules'] = False # default value
+
+        if 'archived' in self.config:
+            if not isinstance(self.config['archived'], bool):
+                raise TypeError(f'Config value `archived` must be a bool in repository {name}')
+        else:
+            self.config['archived'] = False # default value
+
 
     def checkAccess(self) -> bool:
         if not isLoggedIn():
@@ -113,13 +121,13 @@ class Repository:
             repo = self._updateRepo(reponame)
             try:
                 if self._build(reponame):
-                    msg = f"#{repo.head.commit.hexsha[0:6]} Build succeeded."
+                    msg = f"#{repo.head.commit.hexsha[:10]} Build succeeded."
                     time_end = time.time()
                 else:
-                    msg = f"#{repo.head.commit.hexsha[0:6]} Build failed."
+                    msg = f"#{repo.head.commit.hexsha[0:10]} Build failed."
                     time_end = time.time()
             except:
-                msg = f"#{repo.head.commit.hexsha[0:6]} Build error."
+                msg = f"#{repo.head.commit.hexsha[0:10]} Build error."
                 raise
         except GitCommandError as e:
             msg = f"Pull error. ({e})"
@@ -181,3 +189,72 @@ class Repository:
         logfile.close()
         print(f"Building {reponame} completed")
         return p.returncode == 0
+
+    @staticmethod
+    def _format_time_ago(time_str):
+        try:
+            time = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
+            now = datetime.now()
+            diff = now - time
+
+            if diff.days > 0:
+                if diff.days == 1:
+                    return "1 day ago"
+                return f"{diff.days} days ago"
+            elif diff.seconds >= 3600:
+                hours = diff.seconds // 3600
+                if hours == 1:
+                    return "1 hour ago"
+                return f"{hours} hours ago"
+            elif diff.seconds >= 60:
+                minutes = diff.seconds // 60
+                if minutes == 1:
+                    return "1 minute ago"
+                return f"{minutes} minutes ago"
+            else:
+                return "just now"
+        except ValueError:
+            return time_str # orig if parse fails
+        
+    def get_commit_info(self, commit_hash):
+        localpath = os.path.join(self.repodir, self.name)
+        repo = Repo(localpath)
+        commit = repo.commit(commit_hash)
+        commit_msg = commit.message.strip().split('\n')[0]
+        commit_author = commit.author.name
+        commit_url = f"https://git.fykos.cz/FYKOS/{self.name}/commit/{commit.hexsha}"
+        return commit_msg, commit_author, commit_url
+
+    def get_current_build_status(self):
+        records = self.logger.getLogs()
+        if len(records) == 0: 
+            return {"status": "unknown", "timeinfo": "", "user": ""}
+
+        last_record = records[0]
+        
+        if "Build failed." in last_record[1]:
+            status = "failed"
+            for record in records:
+                if "Build succeeded." in record[1]:
+                    break
+                if "Build failed." in record[1]:
+                    last_record = record
+        elif "Build succeeded." in last_record[1]:
+            status = "succeeded"
+        else:
+            status = "unknown"
+        
+        commit_hash = last_record[1].split()[0][1:]
+        try:
+            commit_msg, commit_author, commit_url = self.get_commit_info(commit_hash)
+            return {
+                "status": status,
+                "timeinfo": f"- {self._format_time_ago(last_record[0])}",
+                "commit": f" - <a href='{commit_url}' target='_blank'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
+            }
+        except Exception as e:
+            return {
+                "status": status,
+                "timeinfo": f"- {self._format_time_ago(last_record[0])}",
+                "commit": ""
+            }        

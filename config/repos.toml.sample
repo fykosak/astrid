@@ -9,4 +9,5 @@ git_path='gitea@fykos.cz:FYKOS/fykos37.git' # ssh address of git repository, str
 allowed_roles=['fksdb-fykos'] # array of allowed users, array of strings
 build_cmd='make -k all' # build command, string
 image_version='latest' # docker image version of buildtools, string, optional (default 'latest')
+archived=false # whether the repo is archived (will only be shown in the archive)
 submodules=false # does repo have submodules, bool, optional (default false)
