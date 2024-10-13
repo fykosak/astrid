@@ -82,7 +82,7 @@ def info(repo: Repository):
             commit_hash = log[1].split()[0][1:]
             try:
                 commit_msg, commit_author, commit_url = repo.get_commit_info(commit_hash)
-                formatted_commit_info = f"<a href='{commit_url}' target='_blank'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
+                formatted_commit_info = f"<a href='{commit_url}' target='_blank' class='link-pink'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
             except Exception as e:
                 formatted_commit_info = ''
         else:

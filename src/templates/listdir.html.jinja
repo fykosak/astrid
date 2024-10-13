@@ -14,20 +14,20 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td><a href=".." class="text-decoration-none"><i class="bi bi-arrow-up"></i> Parent Directory</a></td>
+			<td><a href=".." class="link-pink text-decoration-none"><i class="bi bi-arrow-up"></i> Parent Directory</a></td>
 			<td></td>
 			<td></td>
 		</tr>
 		{% for dir in dirs %}
 		<tr>
-			<td><a href="{{dir[0]}}/" class="text-decoration-none"><i class="bi bi-folder"></i> {{dir[0]}}/</a></td>
+			<td><a href="{{dir[0]}}/" class="link-pink text-decoration-none"><i class="bi bi-folder"></i> {{dir[0]}}/</a></td>
 			<td>{{dir[1]}}</td>
 			<td>{{dir[2]}}</td>
 		</tr>
 		{% endfor %}
 		{% for file in files %}
 		<tr>
-			<td><a href="{{file[0]}}" class="text-decoration-none"><i class="bi bi-file-earmark"></i> {{file[0]}}</a></td>
+			<td><a href="{{file[0]}}" class="link-pink text-decoration-none"><i class="bi bi-file-earmark"></i> {{file[0]}}</a></td>
 			<td>{{file[1]}}</td>
 			<td>{{file[2]}}</td>
 		</tr>

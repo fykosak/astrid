@@ -1,3 +1,47 @@
 table td {
     padding: 1px 10px 1px 10px;
 }
+
+:root {
+    --bs-pink: #da1175;
+}
+
+.btn-pink {
+    color: #fff;
+    background-color: var(--bs-pink);
+    border-color: var(--bs-pink);
+}
+
+.btn-pink:hover {
+    color: #fff;
+    background-color: #b80e63;
+    border-color: #ad0d5d;
+}
+
+.btn-outline-pink {
+    color: var(--bs-pink) !important;
+    border-color: var(--bs-pink) !important;
+}
+
+.btn-outline-pink:hover {
+    color: #fff !important;
+    background-color: var(--bs-pink) !important;
+    border-color: var(--bs-pink) !important;
+}
+
+.link-pink {
+    color: var(--bs-pink) !important;
+}
+
+.link-pink:hover {
+    color: #b80e63  !important;
+    text-decoration: underline  !important;
+}
+
+.text-pink {
+    color: var(--bs-pink) !important;
+}
+
+.bg-pink {
+    background-color: var(--bs-pink) !important;
+}

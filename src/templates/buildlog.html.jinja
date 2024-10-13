@@ -2,19 +2,19 @@
 {% block title %}{{repo_name}} buildlog{% endblock %}
 {% block content %}
 <h2 class="mb-4">Build Log for {{repo_name}}</h2>
-<a href="{{ url_for('index') }}" class="btn btn-secondary mb-3 me-2">
+<a href="{{ url_for('index') }}" class="btn btn-outline-secondary mb-3 me-2">
     <i class="bi bi-arrow-left"></i> Back
 </a>
 <a href="{{ url_for('info', repo_name=repo_name) }}" class="btn btn-info mb-3 me-2">
     <i class="bi bi-clock-history"></i> Build History
 </a>
 {% if log %}
-    <a href="#bottom" class="btn btn-secondary mb-3">
+    <a href="#bottom" class="btn btn-outline-secondary mb-3">
         <i class="bi bi-arrow-down"></i> Go to Bottom
     </a>
 
     <pre class="p-4 bg-dark text-light border border-secondary rounded"><code>{{ log | e }}</code></pre>
-    <a href="#" class="btn btn-secondary mb-5">
+    <a href="#" class="btn btn-outline-secondary mb-5">
         <i class="bi bi-arrow-up"></i> Go to Top
     </a>
 {% else %}

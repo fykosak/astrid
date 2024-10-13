@@ -121,13 +121,13 @@ class Repository:
             repo = self._updateRepo(reponame)
             try:
                 if self._build(reponame):
-                    msg = f"#{repo.head.commit.hexsha[:10]} Build succeeded."
+                    msg = f"#{repo.head.commit.hexsha[:8]} Build succeeded."
                     time_end = time.time()
                 else:
-                    msg = f"#{repo.head.commit.hexsha[0:10]} Build failed."
+                    msg = f"#{repo.head.commit.hexsha[0:8]} Build failed."
                     time_end = time.time()
             except:
-                msg = f"#{repo.head.commit.hexsha[0:10]} Build error."
+                msg = f"#{repo.head.commit.hexsha[0:8]} Build error."
                 raise
         except GitCommandError as e:
             msg = f"Pull error. ({e})"
@@ -250,7 +250,7 @@ class Repository:
             return {
                 "status": status,
                 "timeinfo": f"- {self._format_time_ago(last_record[0])}",
-                "commit": f" - <a href='{commit_url}' target='_blank'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
+                "commit": f" - <a href='{commit_url}' target='_blank' class='link-pink'>#{commit_hash}</a>: {commit_msg} (by {commit_author})"
             }
         except Exception as e:
             return {
