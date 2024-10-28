@@ -215,7 +215,7 @@ class Repository:
                 return "just now"
         except ValueError:
             return time_str # orig if parse fails
-        
+
     def get_commit_info(self, commit_hash):
         localpath = os.path.join(self.repodir, self.name)
         repo = Repo(localpath)
@@ -227,11 +227,11 @@ class Repository:
 
     def get_current_build_status(self):
         records = self.logger.getLogs()
-        if len(records) == 0: 
+        if len(records) == 0:
             return {"status": "unknown", "timeinfo": "", "user": ""}
 
         last_record = records[0]
-        
+
         if "Build failed." in last_record[1]:
             status = "failed"
             for record in records:
@@ -243,7 +243,7 @@ class Repository:
             status = "succeeded"
         else:
             status = "unknown"
-        
+
         commit_hash = last_record[1].split()[0][1:]
         try:
             commit_msg, commit_author, commit_url = self.get_commit_info(commit_hash)
@@ -257,4 +257,4 @@ class Repository:
                 "status": status,
                 "timeinfo": f"- {self._format_time_ago(last_record[0])}",
                 "commit": ""
-            }        
+            }

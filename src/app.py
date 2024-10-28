@@ -186,7 +186,7 @@ def repository(repo: Repository, path=''):
 
         mime = magic.Magic(mime=True)
         detected_mime = mime.from_file(target_path)
-        if detected_mime in ['application/pdf', 'text/xml', "application/json"]:
+        if detected_mime in ['application/pdf', 'text/xml', "application/json", "text/html"]:
             return send_from_directory(repo_dir, normalized_path)
         elif detected_mime.startswith('text/'):
             file_display_type = 'text'
