@@ -216,13 +216,19 @@ class Repository:
         except ValueError:
             return time_str # orig if parse fails
 
+    def _git_remote_ssh_to_url(self, remote: str) -> str:
+        parts = remote.split(':')[1].split('/')
+        org_name = parts[0]
+        repo_name = parts[1].replace('.git', '')
+        return f"{self.config['gitea_url'].strip('/')}/{org_name}/{repo_name}/"
+
     def get_commit_info(self, commit_hash):
         localpath = os.path.join(self.repodir, self.name)
         repo = Repo(localpath)
         commit = repo.commit(commit_hash)
         commit_msg = commit.message.strip().split('\n')[0]
         commit_author = commit.author.name
-        commit_url = f"https://git.fykos.cz/FYKOS/{self.name}/commit/{commit.hexsha}"
+        commit_url = self._git_remote_ssh_to_url(repo.remote().url) + 'commit/' + commit_hash
         return commit_msg, commit_author, commit_url
 
     def get_current_build_status(self):

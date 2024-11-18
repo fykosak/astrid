@@ -4,6 +4,9 @@
 # specified by [reponame] with listed config values.
 #
 
+[common]
+gitea_url='https://git.fykos.cz' # url for accessing gitea in a browser
+
 [fykos37] # reponame
 git_path='gitea@fykos.cz:FYKOS/fykos37.git' # ssh address of git repository, string
 allowed_roles=['fksdb-fykos'] # array of allowed users, array of strings

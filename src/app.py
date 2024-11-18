@@ -28,9 +28,10 @@ registerAuthRoutes(app)
 
 # load repos
 with open('/data/config/repos.toml', 'rb') as file:
-    reposConfig = tomllib.load(file)
+    repos_config = tomllib.load(file)
 
-repos = {repo: Repository(repo, '/data/repos/', reposConfig[repo]) for repo in reposConfig}
+common_repo_config = repos_config.pop("common")
+repos = {repo: Repository(repo, '/data/repos/', {**common_repo_config, **repos_config[repo]}) for repo in repos_config}
 
 def repo_required(f):
     @wraps(f)
