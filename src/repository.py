@@ -238,14 +238,14 @@ class Repository:
 
         last_record = records[0]
 
-        if "Build failed." in last_record[1]:
+        if len(last_record) > 1 and "Build failed." in last_record[1]:
             status = "failed"
             for record in records:
-                if "Build succeeded." in record[1]:
+                if len(record) > 1 and "Build succeeded." in record[1]:
                     break
-                if "Build failed." in record[1]:
+                else:
                     last_record = record
-        elif "Build succeeded." in last_record[1]:
+        elif len(last_record) > 1 and "Build succeeded." in last_record[1]:
             status = "succeeded"
         else:
             status = "unknown"

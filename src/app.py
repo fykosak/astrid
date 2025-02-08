@@ -185,11 +185,22 @@ def repository(repo: Repository, path=''):
         file_display_type = 'other'
         file_content = None
 
-        mime = magic.Magic(mime=True)
-        detected_mime = mime.from_file(target_path)
-        if detected_mime in ['application/pdf', 'text/xml', "application/json", "text/html"]:
+        detected_mime = magic.Magic(mime=True).from_file(target_path)
+
+        # always send these as is
+        if detected_mime in ['application/pdf', 'text/xml', 'application/json', 'text/html']:
             return send_from_directory(repo_dir, normalized_path)
-        elif detected_mime.startswith('text/'):
+
+        # if requested mime type matches the file mime type (i.e. image/svg+xml requested), return as is
+        if detected_mime in request.accept_mimetypes.values():
+            return send_from_directory(repo_dir, normalized_path)
+
+        # return js and css files as is for displaying html files
+        # (detected mime type is not text/css, so it does not trigger previos condition)
+        if normalized_path.endswith('.js') or normalized_path.endswith('.css'):
+            return send_from_directory(repo_dir, normalized_path)
+
+        if detected_mime.startswith('text/'):
             file_display_type = 'text'
             with open(target_path, 'r', encoding='utf-8', errors='ignore') as file:
                 file_content = file.read()
